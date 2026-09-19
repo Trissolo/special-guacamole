@@ -10,7 +10,7 @@ const config = {
     type: AUTO,
     pixelArt: true,
     width: 50,// 33*4,
-    height: 50, // 19*4,
+    height: 30, // 19*4,
     parent: 'game-container',
     backgroundColor: '#028af8',
     scale: {

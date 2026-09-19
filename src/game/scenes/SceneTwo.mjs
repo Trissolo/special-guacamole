@@ -31,7 +31,26 @@ export class SceneTwo extends Scene
 
         this.add.image(0, 0, 'dt').setOrigin(0);
 
-        this.mazeManager.dt.fill(0x009900).render();
+        this.mazeManager.dt.fill(0x00ccbb).render();
+
+        //  this.currentMaze = new Maze(8, 9);
+        this.currentMaze = new Maze(4, 4);
+
+        this.testBinary();
+
+        // generator
+        const ffgen = this.mazeManager.floodFillInt(this.currentMaze, 0, 9);
+
+        this.timedEvent = this.time.addEvent({ delay: 500, callback: () => ffgen.next(), callbackScope: this, repeat: 19 });
+    }
+
+    testBinary()
+    {
+        this.currentMaze.grid.fill(15);
+
+        this.mazeManager.buildBinaryTree(this.currentMaze, 1, 4, 4);
+
+        this.mazeManager.renderMaze(this.currentMaze, 0x454545, 0, 0, true);
     }
 
 

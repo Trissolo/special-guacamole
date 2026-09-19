@@ -140,4 +140,82 @@ export default class MazeManager
 
         dt.render();
     }
+
+    *floodFillInt(maze, from = 0, amount = 1)
+    {
+        const ffAry = new Uint8Array(maze.grid.length).fill(0);
+        const frontier = [from];
+        ffAry[from] = 1;
+        let control = 0;
+        const {size} = this;
+        
+        const debugVec = new Phaser.Math.Vector2();
+        
+        const {dt} = this;
+        
+        orcus: while(frontier.length !== 0)// && control < amount)
+        {
+            const curr = frontier.shift();
+
+            // debug render
+            
+
+            // if (control++ >= amount)
+            // {
+            //     console.log("%c Breaking 'ORCUS' because amount ", "background-color: #555;");
+            //     break orcus;
+            // }
+
+            console.log(`GRABBED:, ${curr}`); //{x: ${x}, y: ${y}}`);
+
+            for (let dir = 1, temp; dir < 9; dir <<= 1)
+            {
+                const temp = maze[dir](curr);
+                {
+                    if (temp !== null && ffAry[temp] === 0)
+                    {
+                        
+                        frontier.push(temp);
+                        
+                        ffAry[temp] = 1;
+
+                        const {x, y} = Phaser.Math.ToXY(temp, maze.width, maze.height, debugVec);
+                        dt.fill(Phaser.Math.Between(0xffff00, 0xffffff), 0.9, x * size, y * size, size, size);
+                        yield dt.render();
+                        // end debug
+                        
+                        if (control++ >= amount)
+                        {
+                            console.log("%c Breaking ORCUS because amount ", "background-color: #555;");
+                            break orcus;
+                        }
+                        
+
+                        console.log(`Storing: ${temp}, ${JSON.stringify(Phaser.Math.ToXY(temp, maze.width, maze.height, debugVec))}, control: ${control}/${amount}`);
+                        
+                    }
+                }
+            }
+            console.log("---");
+
+        }
+
+
+        console.log("Done", ffAry, control);
+
+        // const {size} = this;
+
+        for (let i = 0; i < ffAry.length; i++)
+        {
+            if (ffAry[i] !== 0)
+            {
+                const {x, y} = Phaser.Math.ToXY(i, maze.width, maze.height, debugVec);
+
+                dt.fill(0xfafafa, 1, x * size, y * size, size, size);
+            }
+        }
+
+        yield dt.render();
+
+    }
 }
