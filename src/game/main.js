@@ -1,6 +1,7 @@
 import { Boot } from './scenes/Boot';
 import { Game as MainGame } from './scenes/Game';
 import { SceneOne } from './scenes/SceneOne.mjs';
+import { SceneTwo } from './scenes/SceneTwo.mjs';
 import { AUTO, Game, Scale } from 'phaser';
 
 // Find out more information about the Game Config at:
@@ -19,7 +20,8 @@ const config = {
     },
     scene: [
         Boot,
-        SceneOne //,
+        SceneTwo
+        // SceneOne //,
         // MainGame
     ]
 };
