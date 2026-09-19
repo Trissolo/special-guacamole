@@ -1,7 +1,10 @@
 import { Scene } from 'phaser';
+import TrMaze from '../modules/TrMaze.mjs';
+import { dirVal } from '../modules/mazeConsts.mjs';
 
 export class Game extends Scene
 {
+    consSeed = 0;
     constructor ()
     {
         super('Game');
@@ -9,20 +12,65 @@ export class Game extends Scene
 
     create ()
     {
-        this.cameras.main.setBackgroundColor(0x00ff00);
+        // this.cameras.main.setBackgroundColor(0x00ff00);
 
-        this.add.image(512, 384, 'background').setAlpha(0.5);
+        this.qqq = new TrMaze(this);
 
-        this.add.text(512, 384, 'Make something fun!\nand share it with us:\nsupport@phaser.io', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
-            align: 'center'
-        }).setOrigin(0.5);
+        const mazeData = this.qqq.recursiveBacktracker(8, 4, 1990);
+        
+        this.mazeData = mazeData;
 
-        this.input.once('pointerdown', () => {
+        console.log(mazeData);
 
-            this.scene.start('GameOver');
+        // this
+        
+        // console.log(mazeData);
+        
+        // qqq.hardcoded();
 
-        });
+        // qqq.dt.clear().fill(0xffff00, 1, 1, 0, qqq.size, 1).render();
+
+        this.add.image(0, 0, 'dt').setOrigin(0);
+
+        this.input.keyboard.on('keydown-Z', this.pressedZ, this);
+
+        this.input.keyboard.on('keydown-X', this.pressedX, this);
+
+        this.input.keyboard.on('keydown-C', this.pressedC, this);
+    }
+
+    pressedZ()
+    {
+        console.log('Z');
+        console.log(`currSeed: ${this.consSeed}`);
+        this.qqq.rnd.sow(`abc${this.consSeed++}`);
+        this.mazeData.grid.fill(15);
+        this.qqq.visited.fill(0);
+        this.qqq.buildRecursiveBacktracker(this.mazeData, true);
+        //this.qqq.generateBinaryTreeMaze(this.mazeData, "SE", false);
+
+        this.qqq.showMaze(this.mazeData);
+    }
+
+    pressedX()
+    {
+        console.log('X');
+        this.qqq.generateBinaryTreeMaze(this.mazeData, "SE", false);
+
+        this.qqq.showMaze(this.mazeData);
+    }
+
+    pressedC()
+    {
+        console.log('C');
+        console.log(`currSeed: ${this.consSeed}`);
+        this.qqq.rnd.sow(`abc${this.consSeed++}`);
+        //this.mazeData.grid.fill(dirVal.TOP + dirVal.LEFT);
+        this.qqq.visited.fill(0);
+        // this.qqq.buildRecursiveBacktracker(this.mazeData, true);
+        this.qqq.generateBinaryTreeMaze(this.mazeData, "SE", true);
+        this.qqq.generateBinaryTreeMaze(this.mazeData, "NE", false);
+
+        this.qqq.showMaze(this.mazeData);
     }
 }
