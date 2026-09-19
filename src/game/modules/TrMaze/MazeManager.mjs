@@ -175,6 +175,13 @@ export default class MazeManager
                     if (temp !== null && ffAry[temp] === 0)
                     {
                         
+                        if (++control >= amount)
+                        {
+                            console.log("%c Breaking ORCUS because amount ", "background-color: #555;");
+                            break orcus;
+                        }
+
+
                         frontier.push(temp);
                         
                         ffAry[temp] = 1;
@@ -184,11 +191,6 @@ export default class MazeManager
                         yield dt.render();
                         // end debug
                         
-                        if (control++ >= amount)
-                        {
-                            console.log("%c Breaking ORCUS because amount ", "background-color: #555;");
-                            break orcus;
-                        }
                         
 
                         console.log(`Storing: ${temp}, ${JSON.stringify(Phaser.Math.ToXY(temp, maze.width, maze.height, debugVec))}, control: ${control}/${amount}`);
