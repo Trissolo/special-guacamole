@@ -29,7 +29,7 @@ export class SceneOne extends Scene
     {
         console.log('SceneOne_git');
 
-        this.mazeManager = new MazeManager(this, 4);
+        this.mazeManager = new MazeManager(this, 3);
         console.log("MMAN", this.mazeManager);
         this.add.image(0, 0, 'dt').setOrigin(0);
 
@@ -69,7 +69,7 @@ export class SceneOne extends Scene
 
         this.pressedN();
 
-        this.addPlayer() ;
+        this.addPlayer(2) ;
 
         this.playerPosition.reset();
         
@@ -105,9 +105,9 @@ export class SceneOne extends Scene
         this.mazeManager.renderMaze(this.currentMaze, 0x898989, 0, 0, true);
     }
 
-    addPlayer()
+    addPlayer(plSize = 3)
     {
-        this.player = this.add.rectangle(0, 0, 3, 3, 0x34dada, 1).setOrigin(0).setDepth(11);
+        this.player = this.add.rectangle(0, 0, plSize, plSize, 0x34dada, 1).setOrigin(0).setDepth(11);
         // console.log(JSON.stringify(dirsEnum));
         for (const stringDir in dirsEnum)
         {

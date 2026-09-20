@@ -50,11 +50,25 @@ export class SceneTwo extends Scene
         this.testBinary();
 
         // generator
-        // const repeat = this.currentMaze.width;            
+        const repeat = this.currentMaze.width * 10;            
         
-        // const ffgen = this.mazeManager.floodFillInt(this.currentMaze, [27, 36], 1, 0, repeat);
+        const ffgen = this.mazeManager.floodFillInt(this.currentMaze, [27, 36], 1, 0, repeat);
 
-        // this.timedEvent = this.time.addEvent({ delay: 220, callback: () => ffgen.next(), callbackScope: this, repeat});
+        const timeEvent = this.timedEvent = this.time.addEvent({
+            delay: 90,
+            callback: () => {
+                // console.log("ffgen:", ffgen, timeEvent.repeatCount);
+
+                ffgen.next();
+
+                if (timeEvent.repeatCount === 0)
+                {
+                    console.log("Timer ended", ffgen.return());
+                }
+            },
+            // callbackScope: this,
+            repeat
+        });
     }
 
     testBinary()
