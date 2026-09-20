@@ -10,6 +10,8 @@ export default class MazeManager
 
     rnd; // = Phaser.Math.RND;
 
+    debugVec = new Phaser.Math.Vector2();
+
     /**
      * 
      * @param {Phaser.Scene} scene 
@@ -100,20 +102,6 @@ export default class MazeManager
 
             const pezspa = size - 1;
 
-            // console.log(elem, (elem & LEFT) !== 0, (elem & RIGHT) !== 0, (elem & UP) !== 0, (elem & DOWN) !== 0);
-            // if (threeWalls.has(elem))
-            // {
-            //     //  dt.fill(0xf7e29b, 1, rx + 1, ry + 1, pezspa, pezspa);
-            //     dt.fill(0xf7e29b, 1, rx + 2, ry + 2, 1, 1);
-            //     // color = 0x3278bd;
-            // }
-            // else if (oneWall.has(elem))
-            // {
-            //     // dt.fill(0x456799, 1, rx + 1, ry + 1, pezspa, pezspa);
-            //     dt.fill(0x456799, 1, rx + 2, ry + 2, 1, 1);
-            // }
-
-            // color = PhaserMath.Between(0x454545, 0xffffff);
 
             if ((elem & UP) !== 0)
             {
@@ -141,79 +129,114 @@ export default class MazeManager
         dt.render();
     }
 
-    *floodFillInt(maze, from = 0, amount = 1)
+    debugDrawCell(cell, maze, color = 0x43dada, alpha = 1, immediatlyRender = true)
+    {
+
+        if (typeof cell === 'number')
+        {
+            const {size} = this;
+
+            const {x, y} = Phaser.Math.ToXY(cell, maze.width, maze.height, this.debugVec);
+
+            this.dt.fill(color, alpha, x * size, y * size, size, size);
+
+            if (immediatlyRender)
+            {
+                this.dt.render();
+            }
+
+            return `Cell: ${cell.toString().padStart(2, " ")} {x: ${x}, y: ${y}}`;
+
+        }
+        else
+        {
+            return `Cell: null`;
+        }
+    }
+
+    debugMazeInfo(maze, sep = '  ')
+    {
+        const res = [];
+
+        const {width, tot} = maze;
+  
+        for (let i = 0, x = 0; i < tot; i++)
+        {
+            if (x === width)
+            {
+                x = 0;
+
+                res.push('\n\n');
+            }
+
+            res.push(i < 10 ?  ` ${i}${sep}`: `${i}${sep}`);
+
+            x++;
+        }
+
+        console.log(`DebugMaze:\nwidth: ${width}, height: ${maze.height}, tot: ${tot}\n\n${res.join('')}`);
+
+        console.log();
+
+    }
+
+    *floodFillInt(maze, from = 0, zoneId = 1, zoneToRemove = 0, filledCellsAmount = maze.tot)
     {
         const ffAry = new Uint8Array(maze.grid.length).fill(0);
+
         const frontier = [from];
-        ffAry[from] = 1;
+
+        ffAry[from] = zoneId;
+
+        console.log(`FloodFill\n`)
+
         let control = 0;
-        const {size} = this;
+
+        const {size, dt} = this;
         
-        const debugVec = new Phaser.Math.Vector2();
-        
-        const {dt} = this;
-        
-        orcus: while(frontier.length !== 0)// && control < amount)
+        orcus: while(frontier.length !== 0)
         {
             const curr = frontier.shift();
 
-            // debug render
-            
+            Phaser.Math.ToXY(curr, maze.width, maze.height, this.debugVec);
 
-            // if (control++ >= amount)
-            // {
-            //     console.log("%c Breaking 'ORCUS' because amount ", "background-color: #555;");
-            //     break orcus;
-            // }
-
-            console.log(`GRABBED:, ${curr}`); //{x: ${x}, y: ${y}}`);
+            console.log(`📦 ${curr} at {x: ${this.debugVec.x}, y: ${this.debugVec.y}`);
 
             for (let dir = 1, temp; dir < 9; dir <<= 1)
             {
                 const temp = maze[dir](curr);
                 {
-                    if (temp !== null && ffAry[temp] === 0)
+                    if (temp !== null && ffAry[temp] === zoneToRemove)
                     {
                         
-                        if (++control >= amount)
+                        if (++control >= filledCellsAmount)
                         {
-                            console.log("%c Breaking ORCUS because amount ", "background-color: #555;");
+                            console.log(`%c Breaking ORCUS because filledCellsAmount (${control}/${filledCellsAmount}) `, "background-color: #555;");
+
                             break orcus;
                         }
 
-
                         frontier.push(temp);
                         
-                        ffAry[temp] = 1;
+                        ffAry[temp] = zoneId;
 
-                        const {x, y} = Phaser.Math.ToXY(temp, maze.width, maze.height, debugVec);
-                        dt.fill(Phaser.Math.Between(0xffff00, 0xffffff), 0.9, x * size, y * size, size, size);
-                        yield dt.render();
-                        // end debug
-                        
-                        
-
-                        console.log(`Storing: ${temp}, ${JSON.stringify(Phaser.Math.ToXY(temp, maze.width, maze.height, debugVec))}, control: ${control}/${amount}`);
+                        yield console.log(this.debugDrawCell(temp, maze, 0x00baba, 0.8));
                         
                     }
                 }
             }
-            console.log("---");
+
 
         }
 
 
         console.log("Done", ffAry, control);
 
-        // const {size} = this;
-
         for (let i = 0; i < ffAry.length; i++)
         {
             if (ffAry[i] !== 0)
             {
-                const {x, y} = Phaser.Math.ToXY(i, maze.width, maze.height, debugVec);
-
-                dt.fill(0xfafafa, 1, x * size, y * size, size, size);
+                this.debugDrawCell(i, maze, 0xfafafa, 1, false);
             }
         }
 
