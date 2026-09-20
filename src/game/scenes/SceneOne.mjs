@@ -30,7 +30,7 @@ export class SceneOne extends Scene
         console.log('SceneOne_git');
 
         this.mazeManager = new MazeManager(this, 4);
-
+        console.log("MMAN", this.mazeManager);
         this.add.image(0, 0, 'dt').setOrigin(0);
 
         // const qqq = new Maze(8, 9);

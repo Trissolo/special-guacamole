@@ -20,7 +20,8 @@ const config = {
     },
     scene: [
         Boot,
-        SceneTwo
+        SceneTwo,
+        SceneOne
         // SceneOne //,
         // MainGame
     ]

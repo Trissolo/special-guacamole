@@ -180,15 +180,74 @@ export default class MazeManager
 
     }
 
+    suboptimalGetExistingNeighbors(cell, maze, res = [])
+    {
+        res.length = 0;
+
+        if (cell !== null)
+        {
+
+            for (let dir = 1, neighbor; dir < 9; dir <<= 1)
+            {
+                neighbor = maze[dir](cell);
+
+                if (neighbor !== null)
+                {
+                    res.push(neighbor);
+                }
+
+            }
+        }
+
+        return res;
+    }
+
+    suboptimalDebugNeighbors(cell, maze, res = [])
+    {
+        //const nei = this.suboptimalGetExistingNeighbors(cell, maze, res);
+        res.length = 0;
+
+        if (cell === null)
+        {
+            return res;
+        }
+
+        res.push(`🫂 ${cell.toString().padStart(2, ' ')}:`);
+
+        for (const prop in dirsEnum)
+        {
+            const nei = maze[dirsEnum[prop]](cell);
+            // console.log(prop, dirsEnum[prop]);
+            if (typeof nei === 'number')
+            {
+                res.push(`${prop}: ${nei}`);
+            }
+        }
+
+        return res.join('\n')
+
+    }
+
     *floodFillInt(maze, from = 0, zoneId = 1, zoneToRemove = 0, filledCellsAmount = maze.tot)
     {
         const ffAry = new Uint8Array(maze.grid.length).fill(0);
 
-        const frontier = [from];
+        const frontier = [];
 
-        ffAry[from] = zoneId;
+        if (!Array.isArray(from))
+        {
+            from = [from]
+        }
 
-        console.log(`FloodFill\n`)
+        for (const elem of from)
+        {
+            ffAry[elem] = zoneId;
+            frontier.push(elem);
+
+        }
+
+
+        console.log(`FloodFill (from: ${from} [${zoneId}])`);
 
         let control = 0;
 
@@ -202,7 +261,7 @@ export default class MazeManager
 
             console.log(`📦 ${curr} at {x: ${this.debugVec.x}, y: ${this.debugVec.y}`);
 
-            for (let dir = 1, temp; dir < 9; dir <<= 1)
+            for (let dir = 1; dir < 9; dir <<= 1)
             {
                 const temp = maze[dir](curr);
                 {
@@ -225,7 +284,6 @@ export default class MazeManager
                     }
                 }
             }
-
 
         }
 

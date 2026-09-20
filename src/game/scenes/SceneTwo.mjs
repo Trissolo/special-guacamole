@@ -20,7 +20,14 @@ export class SceneTwo extends Scene
     constructor ()
     {
         super('SceneTwo');
+    }
 
+    init(payload)
+    {
+        this.input.keyboard.once('keydown-N', () => {
+            this.textures.remove('dt');
+            this.scene.switch('SceneOne')
+        });
     }
 
     create ()
@@ -34,17 +41,20 @@ export class SceneTwo extends Scene
         this.mazeManager.dt.fill(0x00ccbb).render();
 
         this.currentMaze = new Maze(8, 9);
-        //this.currentMaze = new Maze(4, 4);
+        // this.currentMaze = new Maze(4, 4);
 
         this.mazeManager.debugMazeInfo(this.currentMaze);
+
+        console.log(this.mazeManager.suboptimalDebugNeighbors(27, this.currentMaze, []));
 
         this.testBinary();
 
         // generator
-        const repeat = 11;
-        const ffgen = this.mazeManager.floodFillInt(this.currentMaze, 0, 1, 0, repeat);
+        // const repeat = this.currentMaze.width;            
+        
+        // const ffgen = this.mazeManager.floodFillInt(this.currentMaze, [27, 36], 1, 0, repeat);
 
-        this.timedEvent = this.time.addEvent({ delay: 220, callback: () => ffgen.next(), callbackScope: this, repeat});
+        // this.timedEvent = this.time.addEvent({ delay: 220, callback: () => ffgen.next(), callbackScope: this, repeat});
     }
 
     testBinary()
