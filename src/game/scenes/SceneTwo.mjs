@@ -3,6 +3,8 @@ import { dirsEnum, oppositesEnum } from '../modules/TrMaze/const.mjs';
 import Maze from '../modules/TrMaze/Maze.mjs';
 import MazeManager from '../modules/TrMaze/MazeManager.mjs';
 
+import { MazePlayer } from '../modules/MazePlayer.mjs';
+
 export class SceneTwo extends Scene
 {
     consSeed = 0;
@@ -25,8 +27,10 @@ export class SceneTwo extends Scene
     init(payload)
     {
         this.input.keyboard.once('keydown-N', () => {
+
             this.textures.remove('dt');
-            this.scene.switch('SceneOne')
+            
+            this.scene.switch('SceneOne');
         });
     }
 
@@ -49,13 +53,16 @@ export class SceneTwo extends Scene
 
         this.testBinary();
 
+        new MazePlayer(this, 3, 0x7889db);
+
         // generator
-        const repeat = this.currentMaze.width * 10;            
+        const repeat = this.currentMaze.width * 6;            
         
-        const ffgen = this.mazeManager.floodFillInt(this.currentMaze, [27, 36], 1, 0, repeat);
+        const ffgen = this.mazeManager.floodFillInt(this.currentMaze, [27, 53], 1, 0, repeat);
 
         const timeEvent = this.timedEvent = this.time.addEvent({
-            delay: 90,
+            delay: 290,
+            repeat,
             callback: () => {
                 // console.log("ffgen:", ffgen, timeEvent.repeatCount);
 
@@ -65,9 +72,7 @@ export class SceneTwo extends Scene
                 {
                     console.log("Timer ended", ffgen.return());
                 }
-            },
-            // callbackScope: this,
-            repeat
+            }
         });
     }
 

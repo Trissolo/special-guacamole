@@ -1,25 +1,3 @@
-image = Gimp.get_images()[0]
-source_layer = image.get_layers()[0]
-# Gimp.pencil(source_layer, [0, 0, 0, 4])
-
-fill_color = Gegl.Color.new("0x666666")
-stroke_color = Gegl.Color.new("black")
-
-LEFT = 1
-RIGHT = 2
-UP = 4
-DOWN = 8
-
-size = 3
-
-room_width = 8
-room_height = 9
-
-area_width = room_width * size + 1
-area_height = room_height * size + 1
-
-gap = 2
-
 beyondCastleWolfensteinRooms = [
 [5, 4, 6, 1, 2, 5, 4, 6, 9, 0, 0, 0, 0, 0, 0, 10, 6, 1, 8, 0, 0, 8, 2, 5, 10, 3, 5, 0, 0, 6, 3, 9, 13, 2, 1, 0, 0, 2, 1, 14, 6, 3, 9, 0, 0, 10, 3, 5, 10, 1, 4, 0, 0, 4, 2, 9, 5, 0, 8, 0, 0, 8, 0, 6, 9, 10, 7, 9, 10, 7, 9, 10],
 [21, 6, 1, 0, 4, 4, 4, 6, 1, 2, 1, 0, 0, 0, 0, 2, 1, 2, 9, 8, 8, 0, 0, 2, 1, 0, 4, 4, 4, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 1, 0, 0, 8, 8, 8, 0, 10, 1, 0, 0, 5, 4, 4, 2, 5, 0, 0, 2, 9, 8, 0, 2, 9, 8, 8, 10],
@@ -86,90 +64,7 @@ beyondCastleWolfensteinRooms = [
 [5, 4, 0, 2, 5, 4, 4, 6, 1, 0, 0, 2, 1, 8, 0, 2, 1, 0, 0, 2, 1, 6, 1, 2, 1, 0, 0, 2, 1, 2, 9, 10, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 2, 9, 8, 8, 8, 8, 0, 0, 10]
 ]
 
-def fill_rectangle_on_layer(image, layer, x, y, width, height):
-    """
-    Selects a rectangular area on the image and fills it with a specific color
-    on the designated layer.
-    """
-    # 1. Define and set the foreground color using Gegl
-    # fill_color = Gegl.Color.new(color_hex)
-    Gimp.context_set_foreground(fill_color)
-    
-    # 2. Create the rectangular selection on the image
-    # Gimp.ChannelOps.REPLACE clears any previous selection first
-    Gimp.Image.select_rectangle(
-        image, 
-        Gimp.ChannelOps.REPLACE, 
-        x, 
-        y, 
-        width, 
-        height
-    )
-    
-    # 3. Fill the active selection area on the specific layer
-    layer.edit_fill(Gimp.FillType.FOREGROUND)
-    
-    # 4. Optional: Clear the selection when done
-    Gimp.Selection.none(image)
 
-def drawRoom(data, layer, offset_x=0, offset_y=0):
-    Gimp.context_set_foreground(stroke_color)
-    x = 0
-    y = 0
-    for elem in data:
-        dx = x * size + offset_x
-        dy = y * size + offset_y
-        if (elem & UP) != 0:
-            Gimp.pencil(layer, [dx, dy, dx + size, dy])
-        if (elem & DOWN) != 0:
-                    Gimp.pencil(layer, [dx, dy + size, dx + size, dy + size])
-        if (elem & LEFT) != 0:
-            Gimp.pencil(layer, [dx, dy, dx, dy + size]) 
-        if (elem & RIGHT) != 0:
-                    Gimp.pencil(layer, [dx + size, dy, dx + size, dy + size])  
-        x = x + 1
-        if x == room_width:
-            x = 0
-            y = y + 1
-
-#fill_rectangle_on_layer(image, source_layer, 0, 0, room_width * size + 1, room_height * size + 1)
-#drawRoom(beyondCastleWolfensteinRooms[0], source_layer)
-
-spacing_x = 0
-spacing_y = 0
-max_x = (area_width + gap) * 8
-for idx, room_data in enumerate(beyondCastleWolfensteinRooms):
-    fill_rectangle_on_layer(image, source_layer, spacing_x, spacing_y, area_width, area_height)
-    drawRoom(room_data, source_layer, spacing_x, spacing_y)
-    spacing_x += area_width + gap
-    if spacing_x > max_x:
-        spacing_x = 0
-        spacing_y += area_height + gap  
-    
-
-'''
-image = Gimp.get_images()[0]
-source_layer = image.get_layers()[0]
-# Gimp.pencil(source_layer, [0, 0, 0, 4])
-    
-fill_color = Gegl.Color.new("0x666666")
-stroke_color = Gegl.Color.new("black")
-    
-LEFT = 1
-RIGHT = 2
-UP = 4
-DOWN = 8
-    
-size = 3
-    
-room_width = 8
-room_height = 9
-    
-area_width = room_width * size + 1
-area_height = room_height * size + 1
-    
-gap = 2
-    
 class BCWRooms():
     def __init__(self, image, size=3):
         
@@ -184,13 +79,14 @@ class BCWRooms():
         self.UP = 4
         self.DOWN = 8
         
-        self.size = size
+        self.sizeX = size
+        self.sizeY = size << 1
         
         self.room_width = 8
         self.room_height = 9
         
-        self.area_width = room_width * size + 1
-        self.area_height = room_height * size + 1
+        self.area_width = self.room_width * size + 1
+        self.area_height = self.room_height * self.sizeY + 1
         
         self.gap = size
         
@@ -224,24 +120,25 @@ class BCWRooms():
     def drawRoom(self, data, offset_x=0, offset_y=0):
         image = self.image
         layer = self.layer
-        size = self.size
+        sizeX = self.sizeX
+        sizeY = self.sizeY
         
-        Gimp.context_set_foreground(stroke_color)
+        Gimp.context_set_foreground(self.stroke_color)
         x = 0
         y = 0
         for elem in data:
-            dx = x * size + offset_x
-            dy = y * size + offset_y
-            if (elem & UP) != 0:
-                Gimp.pencil(layer, [dx, dy, dx + size, dy])
-            if (elem & DOWN) != 0:
-                        Gimp.pencil(layer, [dx, dy + size, dx + size, dy + size])
-            if (elem & LEFT) != 0:
-                Gimp.pencil(layer, [dx, dy, dx, dy + size]) 
-            if (elem & RIGHT) != 0:
-                        Gimp.pencil(layer, [dx + size, dy, dx + size, dy + size])  
+            dx = x * sizeX + offset_x
+            dy = y * sizeY + offset_y
+            if (elem & self.UP) != 0:
+                Gimp.pencil(layer, [dx, dy, dx + sizeX, dy])
+            if (elem & self.DOWN) != 0:
+                Gimp.pencil(layer, [dx, dy + sizeY, dx + sizeX, dy + sizeY])
+            if (elem & self.LEFT) != 0:
+                Gimp.pencil(layer, [dx, dy, dx, dy + sizeY]) 
+            if (elem & self.RIGHT) != 0:
+                Gimp.pencil(layer, [dx + sizeX, dy, dx + sizeX, dy + sizeY])  
             x = x + 1
-            if x == room_width:
+            if x == self.room_width:
                 x = 0
                 y = y + 1
 
@@ -249,4 +146,3 @@ image = Gimp.get_images()[0]
 bclass = BCWRooms(image)
 bclass.fill_rectangle_on_layer(0, 0, bclass.area_width, bclass.area_height)
 bclass.drawRoom([5, 4, 0, 2, 5, 4, 4, 6, 1, 0, 0, 2, 1, 8, 0, 2, 1, 0, 0, 2, 1, 6, 1, 2, 1, 0, 0, 2, 1, 2, 9, 10, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 2, 9, 8, 8, 8, 8, 0, 0, 10])
-'''

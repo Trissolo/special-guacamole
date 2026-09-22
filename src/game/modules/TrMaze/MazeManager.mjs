@@ -287,13 +287,13 @@ export default class MazeManager
 
         }
 
-
         console.log("Done", ffAry, control);
 
         for (let i = 0; i < ffAry.length; i++)
         {
             if (ffAry[i] !== 0)
             {
+                // this.debugDrawCell(i, maze, (ffAry[i] + 1) << 6 , 1, true);
                 this.debugDrawCell(i, maze, 0xfafafa, 1, false);
             }
         }
