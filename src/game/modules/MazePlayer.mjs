@@ -5,8 +5,8 @@ export class MazePlayer extends GameObjects.Rectangle
 {
     maze;
 
-    // offsetX = 3;
-    // offsetY = 3;
+    renderOffsetX = 3;
+    renderOffsetY = 3;
     
     size = 4;
 
@@ -18,9 +18,10 @@ export class MazePlayer extends GameObjects.Rectangle
      */
     constructor(scene, size = 1, color = 0x67bd89)
     {
-        super(scene, 3, 3, size, size, color);
+        super(scene, 0, 0, size, size, color);
         this.setOrigin(0).setDepth(8);
         this.setMov();
+        this.setRenderOffset();
         scene.add.existing(this);
     }
 
@@ -39,6 +40,20 @@ export class MazePlayer extends GameObjects.Rectangle
         }
     }
 
+    setRenderOffset(rox = 1, roy = 1, setPos = false)
+    {
+        this.renderOffsetX = rox;
+
+        this.renderOffsetY = roy;
+
+        if (setPos)
+        {
+            this.setPosition(rox, roy);
+        }
+
+        return this;
+    }
+
     pressedArrow(dir, vec)
     {
         // console.log(`dir: ${dir}, vec: {x: ${vec.x}, y: ${vec.y}}`);
@@ -49,9 +64,22 @@ export class MazePlayer extends GameObjects.Rectangle
 
             this.playerPosition.add(vec);
 
-            this.setPosition(1 + this.playerPosition.x * this.size, 1 + this.playerPosition.y * this.size);
+            this.setPosition(this.renderOffsetX + this.playerPosition.x * this.size, this.renderOffsetY + this.playerPosition.y * this.size);
 
-            //return;
+            return;
+        }
+        
+        const {playerPosition, maze, size} = this;
+
+        const currCell = playerPosition.x + playerPosition.y * maze.width;
+
+        const potCell = maze[dir](currCell);
+
+        if (potCell !== null && ((maze.grid[currCell] & dir) === 0))
+        {
+            playerPosition.add(vec);
+
+            this.setPosition(this.renderOffsetX + playerPosition.x * size, this.renderOffsetY + playerPosition.y * size);
         }
     }
 }

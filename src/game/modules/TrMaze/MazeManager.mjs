@@ -169,7 +169,7 @@ export default class MazeManager
                 res.push('\n\n');
             }
 
-            res.push(i < 10 ?  ` ${i}${sep}`: `${i}${sep}`);
+            res.push(`${i.toString().padStart(2, " ")}${sep}`);
 
             x++;
         }
@@ -300,5 +300,63 @@ export default class MazeManager
 
         yield dt.render();
 
+    }
+
+    scaleMaze(orig)
+    {
+        const res = new Maze(orig.width << 1, orig.height << 1);
+        res.grid.fill(0);
+        const {width: targetRow, grid: targetGrid} = res;
+        console.log(targetRow);
+
+        // this.debugMazeInfo(orig);
+
+        this.debugMazeInfo(res);
+        let curr, tl, tr, bl, br;
+
+        for (let i = 0, len = orig.tot, x = 0, y = 0, row = 0; i < len; i++)
+        {
+            
+            curr = orig.grid[i];
+            tl = (i << 1) + row;
+            tr = tl + 1;
+            bl = tl + targetRow;
+            br = bl + 1;
+
+            console.log(`${i} [${tl} ${tr}]\n   [${bl}, ${br}]`);
+            // console.log(`${i}, ${curr & dirsEnum.LEFT}, ${curr & dirsEnum.UP}, ${curr & dirsEnum.RIGHT}, ${curr & dirsEnum.DOWN}`);
+            if ((curr & dirsEnum.LEFT) !== 0)
+            {
+                targetGrid[tl] |= (curr & dirsEnum.LEFT);
+                targetGrid[bl] |= (curr & dirsEnum.LEFT);
+            }
+            if ((curr & dirsEnum.UP) !== 0)
+            {
+                targetGrid[tl] |= (curr & dirsEnum.UP);
+                targetGrid[tr] |= (curr & dirsEnum.UP);
+            }
+            if ((curr & dirsEnum.RIGHT) !== 0)
+            {
+                targetGrid[tr] |= (curr & dirsEnum.RIGHT);
+                targetGrid[br] |= (curr & dirsEnum.RIGHT);
+            }
+            if ((curr & dirsEnum.DOWN) !== 0)
+            {
+                targetGrid[bl] |= (curr & dirsEnum.DOWN);
+                targetGrid[br] |= (curr & dirsEnum.DOWN);
+            }
+
+            if (++x === orig.width)
+            {
+                x = 0;
+                y++;
+                row += targetRow;
+            }
+
+        }
+
+
+
+        return res;
     }
 }
