@@ -1,4 +1,4 @@
-import { oppositesEnum, dirsEnum } from "./const.mjs";
+import { oppositesEnum, dirsEnum, candidateNeighbors } from "./const.mjs";
 import Phaser from "phaser";
 import Maze from "./Maze.mjs";
 
@@ -15,6 +15,8 @@ export default class MazeManager
     /**
      * 
      * @param {Phaser.Scene} scene 
+     * @param {number} size
+     * 
      */
 
     constructor(scene, size = 4)
@@ -28,7 +30,7 @@ export default class MazeManager
 
     /**
      * 
-     * @param {*} maze 
+     * @param {Maze} maze 
      * @param {number} biasHor 
      * @param {number} biasVer 
      * @param {number} seed 
@@ -359,4 +361,83 @@ export default class MazeManager
 
         return res;
     }
+
+    /**
+     * 
+     * @param {Maze} maze 
+     * @param {number} startingCell
+     * @param {number} [seed = 0]
+     */
+
+    buildRecursiveBacktracker(maze, startingCell, seed = 0)
+    {
+        this.rnd.sow(`abc${seed}`);
+        
+        const visited = new Uint8Array(maze.tot);
+
+        const {grid} = maze;
+        
+        let current = typeof startingCell === "number"? startingCell: this.rnd.integerInRange(0, grid.length - 1);
+        
+        const stack = [current];
+
+        visited[current] = 1;
+
+        const potential = [];
+
+        while(stack.length !== 0)
+        {
+            const next = this.recursiveGetNeighbor(current, maze, visited, potential);
+            if (next !== null)
+            {
+                current = next;
+                stack.push(current);
+            }
+            else
+            {
+                current = stack.pop();
+            }
+        }
+
+        return maze;
+
+    }
+
+    /**
+     * 
+     * @param {number | null} cellIdx 
+     * @param {Maze} maze 
+     * @param {Uint8Array} visited 
+     * @param {Array} potential 
+     */
+    recursiveGetNeighbor(cellIdx, maze, visited, potential)
+    {
+        potential.length = 0;
+
+        //for (let dir = 1, adjacentIdx; dir < 9; dir <<= 1)
+        // {dir, opposite, adjacentIdx: null}
+        for (const elem of candidateNeighbors)
+        {
+            console.log("elem.dir", elem.dir, "maze:", maze)
+            const adjacentIdx = maze[elem.dir](cellIdx);
+
+            if (adjacentIdx !== null && visited[adjacentIdx] === 0)
+            {
+                elem.adjacentIdx = adjacentIdx;
+
+                potential.push(elem);
+            }
+        }
+
+        if (potential.length !== 0)
+        {
+            const {dir, opposite, adjacentIdx} = this.rnd.pick(potential);
+            maze.grid[cellIdx] &= ~dir;
+            maze.grid[adjacentIdx] &= ~opposite;
+            visited[adjacentIdx] = 1;
+            return adjacentIdx;
+        }
+        return null;
+    }
+
 }

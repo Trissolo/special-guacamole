@@ -12,4 +12,11 @@ const oppositesEnum = new Map([
     [dirsEnum.DOWN, dirsEnum.UP]
 ]);
 
-export {dirsEnum, oppositesEnum}
+const candidateNeighbors = [];
+for (const [dir, opposite] of oppositesEnum)
+{
+    candidateNeighbors.push({dir, opposite, adjacentIdx: null})
+}
+
+
+export {dirsEnum, oppositesEnum, candidateNeighbors}

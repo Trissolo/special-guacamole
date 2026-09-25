@@ -44,16 +44,29 @@ export class SceneTwo extends Scene
 
         this.mazeManager.dt.fill(0x00ccbb).render();
 
-        const baseMaze = new Maze(4, 4);
-        baseMaze.grid.fill(15);
-        this.mazeManager.buildBinaryTree(baseMaze, 1, 4, 970);
+        
+        // test scaled maze
+        // build a binaryTree, then scale it
+        // const baseMaze = new Maze(4, 4);
 
-        this.mazeManager.renderMaze(baseMaze, 0x454545, 34, 8, true);
+        // baseMaze.grid.fill(15);
 
-        console.log("Scale");
-        this.currentMaze = this.mazeManager.scaleMaze(baseMaze);
 
-        this.mazeManager.renderMaze(this.currentMaze, 0xfada67);
+        // this.mazeManager.buildBinaryTree(baseMaze, 1, 4, 970);
+
+        // this.mazeManager.renderMaze(baseMaze, 0x454545, 34, 8, true);
+
+        // //console.log("Scale binaryTree");
+        // this.currentMaze = this.mazeManager.scaleMaze(baseMaze);
+
+        // this.mazeManager.renderMaze(this.currentMaze, 0xfada67);
+        // end test scaled maze
+
+        this.currentMaze = new Maze(5, 5);
+
+        this.mazeManager.buildRecursiveBacktracker(this.currentMaze, 0, 0);
+
+        this.mazeManager.renderMaze(this.currentMaze);
 
         // this.currentMaze = new Maze(4, 4);
 
