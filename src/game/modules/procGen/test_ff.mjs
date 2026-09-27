@@ -91,33 +91,35 @@ class ProcGen
                 }
             }
         }
+
 		this.sizeInPixels = sizeInPixels;
         console.dir("sizeInPixels", sizeInPixels, "StartingCoords", this.startingCoords);
         return seeds;
     }
 
-pickColors(wantedColors = 250)
-{
-  // One of my favorite ways to pick colors is to draw a circle on
-  // YIQ space <http://en.wikipedia.org/wiki/YIQ>. Set the radius to
-  // be larger to get more saturated colors. Set Y to be larger to
-  // get brighter colors.
-  var colors = [0]; // background color
-  for (var k = 0; k < wantedColors; k++) {
-  var angle = 2 * Math.PI * k / wantedColors;
-  var radius = 0.05 + 0.05 * Math.cos(angle * 17);
-  var Y = 0.7 + 0.2 * Math.cos(angle * 13);
-  var I = radius * Math.cos(angle);
-  var Q = radius * Math.sin(angle);
-  var r = Y + 0.948262*I + 0.624013*Q;
-  var g = Y - 0.276066*I - 0.639810*Q;
-  var b = Y - 1.105450*I + 1.729860*Q;
-  colors.push(Phaser.Display.Color.GetColor(Math.max(0, Math.min(255, (255 * r) | 0)),
-  Math.max(0, Math.min(255, (255 * g) | 0)),
-  Math.max(0, Math.min(255, (255 * b) | 0))));
-  }
-  return colors;
-}
+    pickColors(wantedColors = 250)
+    {
+    // One of my favorite ways to pick colors is to draw a circle on
+    // YIQ space <http://en.wikipedia.org/wiki/YIQ>. Set the radius to
+    // be larger to get more saturated colors. Set Y to be larger to
+    // get brighter colors.
+    var colors = [0]; // background color
+    for (var k = 0; k < wantedColors; k++) {
+    var angle = 2 * Math.PI * k / wantedColors;
+    var radius = 0.05 + 0.05 * Math.cos(angle * 17);
+    var Y = 0.7 + 0.2 * Math.cos(angle * 13);
+    var I = radius * Math.cos(angle);
+    var Q = radius * Math.sin(angle);
+    var r = Y + 0.948262*I + 0.624013*Q;
+    var g = Y - 0.276066*I - 0.639810*Q;
+    var b = Y - 1.105450*I + 1.729860*Q;
+    colors.push(Phaser.Display.Color.GetColor(Math.max(0, Math.min(255, (255 * r) | 0)),
+    Math.max(0, Math.min(255, (255 * g) | 0)),
+    Math.max(0, Math.min(255, (255 * b) | 0))));
+    }
+    return colors;
+    }
+
     substitute(gridIdx, oldId, newId)
     {
         for (const adj of this.getNeighborsBitwise(gridIdx))
@@ -167,7 +169,9 @@ pickColors(wantedColors = 250)
                         start = i;
                     }
                 }
+
                 res.push(chunks);
+
                 y += 1;
             }
         return res;
@@ -199,9 +203,10 @@ pickColors(wantedColors = 250)
     // for powof2
     getNeighborsBitwise(i)
     {
-      const rowStart = i & this.rowMask;
+        const rowStart = i & this.rowMask;
         // Vertical wrapping (using total cells mask if total is also power of 2)
-		const adiacenti = [
+        
+        const adiacenti = [
         // North
         /*this.aryAdj[0] =*/ (i - this.width + this.totalCells) & (this.totalCells - 1),
 
@@ -209,14 +214,16 @@ pickColors(wantedColors = 250)
         /*this.aryAdj[1] =*/ (i + this.width) & (this.totalCells - 1),
         // Clears the X coordinate to find row start
         // Horizontal wrapping inside the current row
-        
+
 
         // East
         /*this.aryAdj[2] =*/ rowStart + ((i + 1) & this.xMask),
 
         // West
-        /*this.aryAdj[3] =*/ rowStart + ((i - 1) & this.xMask)];
+        /*this.aryAdj[3] =*/ rowStart + ((i - 1) & this.xMask)
         
+        ];
+
         return adiacenti; //this.aryAdj;
     }
 
