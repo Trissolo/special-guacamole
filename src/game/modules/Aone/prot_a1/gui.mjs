@@ -1,14 +1,14 @@
 export default class GUI
 {
-    static toAdd = [];
-    
+    static container = document.getElementById('container');
+
     static {
-        document.getElementById("btn2").addEventListener("pointerdown", GUI.click);
+        // document.getElementById("btn2").addEventListener("pointerdown", GUI.click);
     }
 
     static click()
     {
-        GUI.logWrite("Cleared", true);
+        GUI.clear();
     }
 
     static makeTextNode(text) //line(text, lineBreak = true)
@@ -42,32 +42,28 @@ export default class GUI
 
     static line(text)
     {
-        document.getElementById("container").append(GUI.makeTextNode(text), GUI.makeLineBreak());
+        GUI.container.append(GUI.makeTextNode(text), GUI.makeLineBreak());
 
         return GUI;
     }
 
     static colored(bef, val, col)
     {
-        const container = document.getElementById("container");
-
-        container.append(GUI.makeTextNode(`${bef} `), GUI.makeSpan(`${val}`, col), GUI.makeLineBreak());
+        GUI.container.append(GUI.makeTextNode(`${bef} `), GUI.makeSpan(`${val}`, col), GUI.makeLineBreak());
 
         return GUI;
     }
 
     static removeLineBreak()
     {
-        const container = document.getElementById("container");
-
-        container.removeChild(container.lastChild);
+        GUI.container.removeChild(container.lastChild);
 
         return GUI;
     }
 
     static clear()
     {
-        document.getElementById('container').replaceChildren();
+        GUI.container.replaceChildren();
 
         return GUI;
     }
@@ -101,6 +97,11 @@ export default class GUI
     //     GUI.logWrite(`${text}: <b style="color: ${color}">${elem}</b>`, false, newLine);
         
     // }
+    static destroy()
+    {
+        GUI.container = undefined;
+        console.log("GUI Destroyed)")
+    }
 }
 
 /*
