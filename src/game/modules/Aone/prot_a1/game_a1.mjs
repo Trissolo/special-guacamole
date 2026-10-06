@@ -1,6 +1,6 @@
 import AoneGenericClass from "./Aog.mjs";
 
-const qqq = new AoneGenericClass(55, 13);
+const qqq = new AoneGenericClass();
 qqq.meleeFight();
 
 /*

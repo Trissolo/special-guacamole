@@ -14,7 +14,9 @@ export default class AoneGenericClass
     // attack value for monster in melee
     am = 0;
 
-    constructor(at = 15, rf = 80)
+    xf = 0;
+
+    constructor(at = 215, rf = 80)
     {
         this.setPlayerStats(at, rf);
 
@@ -43,13 +45,14 @@ export default class AoneGenericClass
 
         this.meleeRound();
 
-        // 13990 forj = 1 to nm: gosub200
+        
 
 
     }
 
     meleeRound()
     {
+        console.clear();
         GUI.clear();
         GUI.colored(`nm= ${this.nm}, am= ${this.am} `, `rf = ${this.rf}`, 0x893489).removeLineBreak().line(` AT= ${this.at}`);
         // 13920 print"{rvon}      "y"{left}'  turno di mischia       {rvof}"
@@ -60,6 +63,7 @@ export default class AoneGenericClass
         GUI.line(`Sei in mischia con ${this.nm === 1? 'un solo avversario': `${this.nm} avversari`}`);
 
         // enemies attack loop
+        // 13990 forj = 1 to nm: gosub200
         for (let j = 1; j <= this.nm; j++)
         {
             // nonspecific 'punti attacco' ('attack points')
@@ -67,13 +71,16 @@ export default class AoneGenericClass
             // 14020 if nm >= 4 then pa = int(at / 4): cs = 0: goto 14060
             // 14030 pa = int(at / nm) + 10: cs = 0: xf = 1
 
-            const pa = this.nm >= 4? Math.floor(this.at / this.nm) : Math.floor(this.at / this.nm) + 10;
+            const pa = this.nm >= 4? Math.floor(this.at / 4) : Math.floor(this.at / this.nm) + 10;
             
             // 
             let cs = 0;
             
             // potential wounds inflicted by current enemy
-            let xf = (this.nm >= 4)? 1 : 0;
+            if (this.nm >= 4)
+            {
+                this.xf = 1;
+            }
 
             // random dice roll for 'colpo mancato' ('missing hit')
             // 14060 cm = int(100 * rnd(0)) + 1
@@ -93,7 +100,8 @@ export default class AoneGenericClass
             {
                 // miss
                 GUI.line(`${GUI.emoji.enemyMisses} L'avversario #${j} sbaglia il colpo`);
-                continue;
+                console.log(`${j} xf MISS ${this.xf}`);
+                //continue;
 
             }
             // 14100 if am >= cm and pa < pp then cs = 1
@@ -112,19 +120,20 @@ export default class AoneGenericClass
                 // 14120 if cc >= cm then xf = 2
                 if (cc >= cm)
                 {
-                    xf = 2;
+                    this.xf = 2;
                 }
 
-                GUI.colored("CS=", cs, 0x89aa89).removeLineBreak().colored("  XF=", xf, 0xba6767);
+                GUI.colored("CS=", cs, 0x89aa89).removeLineBreak().colored("  XF=", this.xf, 0xba6767);
                 // 14130 if cs = 1 and xf = 1 then print"*";: printj;: print"'avversario ti fa {rvon}1 ferita{rvof}": rf = rf - 1: goto 14190
                 // 14140 if cs = 1 and xf = 2 then print"*";: printj;: print"'avversario ti fa {rvon}2 ferite{rvof}": rf = rf - 2: goto 14190
-                if (cs === 1 && xf > 0)
+                if (cs === 1 && this.xf > 0)
                 {
-                    const woundAmount = Math.min(2, xf);
+                    const woundAmount = Math.min(2, this.xf);
 
                     GUI.line(`${GUI.emoji.enemyHits.repeat(woundAmount)} L'avversario ti fa ${woundAmount} ferite`);
 
                     this.rf -= woundAmount;
+                    console.log(`${j} WOUND xf: ${this.xf}`);
                     
                 }
                 else
@@ -132,12 +141,14 @@ export default class AoneGenericClass
                     // 14150 if nm = 1 then print"{grn}*{wht} Parato il colpo dell' avversario": goto 14190
                     // 14160 print"{grn}*{wht} Parato colpo del"j"'avversario"
                     GUI.line(`${GUI.emoji.enemyParried} Parato colpo del #${j} avversario`);
+                    console.log(`${j} xf PARRIED = ${this.xf}`);
                 }
 
 
             }
-
-            xf = 1;
+            
+            console.log(`${j} - Resetting xf`);
+            this.xf = 1;
         } // enemies attack loop
 
     // 14190 xf = 1: next: cc = 0: ifnm > 1 then cc = int(at / 15): gosub240
