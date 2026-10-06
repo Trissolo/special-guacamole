@@ -7,7 +7,11 @@ export default class GUI
         debugInfo: '💬',
         enemyHits: '💥',
         enemyMisses: '💨',
-        enemyParried: '🛡️'
+        enemyParried: '🛡️',
+        playerKillsTwo: "⚔️",
+        playerKills: "🗡️",
+        cup: "🏆",
+        lose: "🪦"
     }
 
     // static {
