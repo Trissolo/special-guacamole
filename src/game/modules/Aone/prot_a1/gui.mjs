@@ -2,14 +2,22 @@ export default class GUI
 {
     static container = document.getElementById('container');
 
-    static {
-        // document.getElementById("btn2").addEventListener("pointerdown", GUI.click);
+    static emoji = {
+        bug: `🐛`,
+        debugInfo: '💬',
+        enemyHits: '💥',
+        enemyMisses: '💨',
+        enemyParried: '🛡️'
     }
 
-    static click()
-    {
-        GUI.clear();
-    }
+    // static {
+    //     // document.getElementById("btn2").addEventListener("pointerdown", GUI.click);
+    // }
+
+    // static click()
+    // {
+    //     GUI.clear();
+    // }
 
     static makeTextNode(text) //line(text, lineBreak = true)
     {
@@ -64,6 +72,13 @@ export default class GUI
     static clear()
     {
         GUI.container.replaceChildren();
+
+        return GUI;
+    }
+
+    static addBR()
+    {
+        GUI.container.appendChild(GUI.makeLineBreak());
 
         return GUI;
     }

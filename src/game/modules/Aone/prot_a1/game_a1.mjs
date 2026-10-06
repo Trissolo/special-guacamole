@@ -1,3 +1,9 @@
+import AoneGenericClass from "./Aog.mjs";
+
+const qqq = new AoneGenericClass(55, 13);
+qqq.meleeFight();
+
+/*
 import GUI from "./gui.mjs";
 
 import AoneEmoji from "./AoneEmoji.mjs";
@@ -220,3 +226,4 @@ function determineXXY(at = 80)
 }
 
 // GUI.destroy();
+// */
