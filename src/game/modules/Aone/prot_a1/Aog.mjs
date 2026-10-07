@@ -58,11 +58,11 @@ export default class AoneGenericClass
         GUI.clear();
         GUI.colored(`nm= ${this.nm}, am= ${this.am} `, `rf = ${this.rf}`, 0x893489).removeLineBreak().line(` AT= ${this.at}`);
         // 13920 print"{rvon}      "y"{left}'  turno di mischia       {rvof}"
-        GUI.line(`${this.y++}' turno di mischia`);
+        GUI.line(`${this.y++}' turno di mischia`).addBR(2);
         // 13950 if nm = 1 then print"{down}Sei in mischia con un solo avversario{down}": goto 13990
         // 13960 print"{down}Sei in mischia con"nm"avversari{down}"
 
-        GUI.line(`Sei in mischia con ${this.nm === 1? 'un solo avversario': `${this.nm} avversari`}`);
+        GUI.line(`Sei in mischia con ${this.nm === 1? 'un solo avversario': `${this.nm} avversari:`}`).addBR(2);
 
         let cc;
 
@@ -104,7 +104,8 @@ export default class AoneGenericClass
             if (this.am < cm)
             {
                 // miss
-                GUI.line(`${GUI.emoji.enemyMisses} L'avversario #${j} sbaglia il colpo`);
+                GUI.mixed(`${GUI.emoji.enemyMisses} L'avversario `, `#${j}`, 0xababab, ` sbaglia il colpo`);
+
                 console.log(`${j} xf MISS ${this.xf}`);
                 //continue;
 
@@ -135,7 +136,7 @@ export default class AoneGenericClass
                 {
                     const woundAmount = Math.min(2, this.xf);
 
-                    GUI.line(`${GUI.emoji.enemyHits.repeat(woundAmount)} L'avversario ti fa ${woundAmount} ferite`);
+                    GUI.mixed(`${GUI.emoji.enemyHits.repeat(woundAmount)} L'avversario `, `#${j} `, 0x894343, `ti fa `, `${woundAmount} `, 0x565656, woundAmount===1? `ferita`:`ferite`);
 
                     this.rf -= woundAmount;
                     console.log(`${j} WOUND xf: ${this.xf}`);

@@ -80,12 +80,91 @@ export default class GUI
         return GUI;
     }
 
-    static addBR()
+    static addBR(amount = 1)
     {
-        GUI.container.appendChild(GUI.makeLineBreak());
+        for (let i = 0; i < amount; i++)
+        {
+            GUI.container.appendChild(GUI.makeLineBreak());
+        }
 
         return GUI;
     }
+
+    // static follia(...p)
+    // {
+    //     let i = 0;
+    //     let ctrl = 0;
+    //     let prev;
+    //     while (i < p.length && ctrl++ < 10)
+    //     {
+    //         prev = p[i++];
+    //         //console.log(`elem: ${p[i]}, i: ${i++}, ctrl: ${ctrl}}`)
+    //         if ('number' === typeof p[i])
+    //         {
+    //             console.log("colored:", prev, p[i++])
+    //         }
+    //         else
+    //         {
+    //             console.log("line", prev);
+    //         }
+    //     }
+    // }
+
+    static mixed(...params)
+    {
+        if (params.length === 0) return;
+
+        for (let i = 0; i < params.length; i++)
+        {
+            const current = params[i];
+            const next = params[i + 1];
+
+            if (typeof next === 'number')
+            {
+                console.log(`Text to be colored: ${current}, color: ${next}`);
+                GUI.container.appendChild(GUI.makeSpan(current, next));
+                i++; // Skip the color index on the next iteration
+            }
+            else
+            {
+                console.log(`text (standard color): ${current}`);
+
+                GUI.container.appendChild(GUI.makeTextNode(current));
+            }
+        }
+
+        return GUI.addBR(2);
+    }
+
+    // alternativeTextColor(...params)
+    // {
+    //     let textPendingColor = null;
+
+    //     for (const item of params) {
+    //         if (typeof item === 'number') {
+    //             if (textPendingColor !== null) {
+    //                 console.log(`Text to be colored: ${textPendingColor}, color: ${item}`);
+    //                 textPendingColor = null;
+    //             }
+    //         } else {
+    //             // If there was a previous text that didn't get a color, it's standard color
+    //             if (textPendingColor !== null) {
+    //                 console.log(`text (standard color): ${textPendingColor}`);
+    //             }
+    //             textPendingColor = item;
+    //         }
+    //     }
+
+    //     // Flush any trailing text at the end of the array
+    //     if (textPendingColor !== null) {
+    //         console.log(`text (standard color): ${textPendingColor}`);
+    //     }
+    // }
+
+
+
+//uff("a", "b", 543, "c", "d", 999);
+   
 
     // static logWrite(text, clearBefore = false, newLine = true)
     // {
