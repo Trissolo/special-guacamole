@@ -18,18 +18,23 @@ export default class AoneGenericClass
 
     sm = 0;
 
-    constructor(at = 45, rf = 14)
+    constructor(at = 65, rf = 14)
     {
         this.setPlayerStats(at, rf);
 
         document.getElementById("btn2").addEventListener("pointerdown", () => this.meleeRound());
     }
 
-    setPlayerStats(at = 35, rf = 14)
+    setPlayerStats(at, rf)
     {
         this.at = at;
 
         this.rf = rf;
+    }
+
+    diceRoll(max = 100)
+    {
+        return Math.floor(max * Math.random()) + 1;
     }
 
     meleeFight()
@@ -58,7 +63,7 @@ export default class AoneGenericClass
         GUI.clear();
         GUI.colored(`nm= ${this.nm}, am= ${this.am} `, `rf = ${this.rf}`, 0x893489).removeLineBreak().line(` AT= ${this.at}`);
         // 13920 print"{rvon}      "y"{left}'  turno di mischia       {rvof}"
-        GUI.line(`${this.y++}' turno di mischia`).addBR(2);
+        GUI.line(`${this.y++}° turno di mischia`).addBR(2);
         // 13950 if nm = 1 then print"{down}Sei in mischia con un solo avversario{down}": goto 13990
         // 13960 print"{down}Sei in mischia con"nm"avversari{down}"
 
@@ -88,12 +93,12 @@ export default class AoneGenericClass
 
             // random dice roll for 'colpo mancato' ('missing hit')
             // 14060 cm = int(100 * rnd(0)) + 1
-            const cm = Math.floor(100 * Math.random()) + 1;
+            const cm = this.diceRoll();
             // GUI.addBR().line(`${GUI.emoji.debugInfo} ${this.am} > ${cm}`);
 
             // random dice roll for 'player parry'
             // 14070 pp = int(100 * rnd(0)) + 1
-            const pp = Math.floor(100 * Math.random()) + 1;
+            const pp = this.diceRoll();
 
             // let cc;
 
@@ -105,9 +110,6 @@ export default class AoneGenericClass
             {
                 // miss
                 GUI.mixed(`${GUI.emoji.enemyMisses} L'avversario `, `#${j}`, 0xababab, ` sbaglia il colpo`);
-
-                console.log(`${j} xf MISS ${this.xf}`);
-                //continue;
 
             }
             // 14100 if am >= cm and pa < pp then cs = 1
@@ -129,7 +131,7 @@ export default class AoneGenericClass
                     this.xf = 2;
                 }
 
-                GUI.colored("CS=", cs, 0x89aa89).removeLineBreak().colored("  XF=", this.xf, 0xba6767);
+                // GUI.colored("CS=", cs, 0x89aa89).removeLineBreak().colored("  XF=", this.xf, 0xba6767);
                 // 14130 if cs = 1 and xf = 1 then print"*";: printj;: print"'avversario ti fa {rvon}1 ferita{rvof}": rf = rf - 1: goto 14190
                 // 14140 if cs = 1 and xf = 2 then print"*";: printj;: print"'avversario ti fa {rvon}2 ferite{rvof}": rf = rf - 2: goto 14190
                 if (cs === 1 && this.xf > 0)
@@ -139,32 +141,28 @@ export default class AoneGenericClass
                     GUI.mixed(`${GUI.emoji.enemyHits.repeat(woundAmount)} L'avversario `, `#${j} `, 0x894343, `ti fa `, `${woundAmount} `, 0x565656, woundAmount===1? `ferita`:`ferite`);
 
                     this.rf -= woundAmount;
-                    console.log(`${j} WOUND xf: ${this.xf}`);
-                    
                 }
                 else
                 {
                     // 14150 if nm = 1 then print"{grn}*{wht} Parato il colpo dell' avversario": goto 14190
                     // 14160 print"{grn}*{wht} Parato colpo del"j"'avversario"
-                    GUI.line(`${GUI.emoji.enemyParried} Parato colpo del #${j} avversario`);
-                    console.log(`${j} xf PARRIED = ${this.xf}`);
+                    GUI.line(`${GUI.emoji.enemyParried} Parato colpo del #${j} avversario`).addBR();
                 }
 
 
             }
             
-            console.log(`${j} - Resetting xf`);
             this.xf = 1;
         } // enemies attack loop
 
         // player attaks
-        GUI.line("-----").addBR().addBR();
+        GUI.line("-----").addBR(2);
         // 14190 xf = 1: next: cc = 0: ifnm > 1 then cc = int(at / 15): gosub240
         cc = (this.nm > 1)? Math.floor(this.at / 15): 0;
         // 14230 if ks > 0 then 14250
         // 14240 if left$(nm$,2) = " L" or left$(im$,2) = " L" then gosub280: goto 14350
         // 14250 ap = int(100 * rnd(0)) + 1
-        const ap = Math.floor(100 * Math.random()) + 1;
+        const ap = this.diceRoll();
         // 14260 if at < ap then print"{down}Hai mancato il tuo colpo": goto 14350
 
         // 14290 ts = 0
@@ -176,7 +174,7 @@ export default class AoneGenericClass
         else
         {
             // 14270 xs = int(100 * rnd(0)) + 1
-            const xs = Math.floor(100 * Math.random()) + 1;
+            const xs = this.diceRoll();
             // 14280 if at >= ap and sm >= xs then print"{down}L'avversario ha scansato tuo colpo": goto 14350
             if (this.sm >= xs)
             {
@@ -214,7 +212,7 @@ export default class AoneGenericClass
         // 14350 gosub200
         // 14360 if rf <= 0 then rf = 0
         // 14370 print"{down}la tua robustezza e' ora "rf: gosub240
-        GUI.addBR().line(`La tua robustezza e' ora ${this.rf}`);
+        GUI.addBR().line(`La tua robustezza è ora ${this.rf}`);
 
         // 14400 if rf <= 0 then print"{down}Sei morto !{160}!{160}!{160}!{160}!{160}!": rem syss + 18: goto 12210
         // 14410 if nm = 0 then 14740
@@ -255,13 +253,13 @@ export default class AoneGenericClass
         if (this.nm <= 0)
         {
             document.getElementById("btn2").hidden = true;
-            return GUI.addBR().addBR().line(`${GUI.emoji.cup} Hai vinto! (avversari ora: ${this.nm})`);
+            return GUI.addBR(2).line(`${GUI.emoji.cup} Hai vinto! (avversari ora: ${this.nm})`);
         }
         if (this.rf <= 0)
         {
             //document.getElementById("btn2").removeEventListener("pointerdown");
             document.getElementById("btn2").hidden = true;
-            return GUI. GUI.addBR().addBR().line(`${GUI.emoji.lose} Hai PERSO! (rf = ${this.rf})`);
+            return GUI.addBR(2).line(`${GUI.emoji.lose} Hai PERSO! (rf = ${this.rf})`);
         }
 
     } // end meleeRound method

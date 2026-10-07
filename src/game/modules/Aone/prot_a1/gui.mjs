@@ -90,26 +90,6 @@ export default class GUI
         return GUI;
     }
 
-    // static follia(...p)
-    // {
-    //     let i = 0;
-    //     let ctrl = 0;
-    //     let prev;
-    //     while (i < p.length && ctrl++ < 10)
-    //     {
-    //         prev = p[i++];
-    //         //console.log(`elem: ${p[i]}, i: ${i++}, ctrl: ${ctrl}}`)
-    //         if ('number' === typeof p[i])
-    //         {
-    //             console.log("colored:", prev, p[i++])
-    //         }
-    //         else
-    //         {
-    //             console.log("line", prev);
-    //         }
-    //     }
-    // }
-
     static mixed(...params)
     {
         if (params.length === 0) return;
@@ -121,14 +101,12 @@ export default class GUI
 
             if (typeof next === 'number')
             {
-                console.log(`Text to be colored: ${current}, color: ${next}`);
                 GUI.container.appendChild(GUI.makeSpan(current, next));
+
                 i++; // Skip the color index on the next iteration
             }
             else
             {
-                console.log(`text (standard color): ${current}`);
-
                 GUI.container.appendChild(GUI.makeTextNode(current));
             }
         }
@@ -162,10 +140,6 @@ export default class GUI
     // }
 
 
-
-//uff("a", "b", 543, "c", "d", 999);
-   
-
     // static logWrite(text, clearBefore = false, newLine = true)
     // {
     //     const guiPre = document.getElementById("container");
@@ -195,6 +169,7 @@ export default class GUI
     //     GUI.logWrite(`${text}: <b style="color: ${color}">${elem}</b>`, false, newLine);
         
     // }
+    
     static destroy()
     {
         GUI.container = undefined;
