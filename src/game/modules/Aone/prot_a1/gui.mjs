@@ -108,7 +108,7 @@ export default class GUI
             }
             else
             {
-                GUI.container.appendChild(GUI.makeTextNode(current));
+                GUI.container.appendChild(GUI.makeSpan(current, false));//GUI.makeTextNode(current));
             }
         }
 
@@ -234,4 +234,32 @@ contenitore.insertAdjacentHTML('beforeend', 'Questo è il testo<br>');
 
 document.body.appendChild(contenitore);
 
+*/
+
+/*
+// alt method:
+const cont = document.getElementById("container");
+const rary = [];
+for (let i = 0; i < 10; i++)
+{
+	const line = document.createElement('pre');
+    line.appendChild(document.createTextNode(`Riga all indice [${i}]`));
+    rary.push(line);
+    cont.appendChild(line)
+    
+}
+console.log(rary)
+//let text = "How are you doing today?";
+//const myArray = text.split(" ");
+const idx = 5;
+const wantedLine = rary[idx];
+wantedLine.replaceChildren();
+wantedLine.appendChild(document.createTextNode(`Custom text`));
+const spanElement = document.createElement('span');
+
+spanElement.appendChild(document.createTextNode(` [${idx}]`));
+spanElement.style.setProperty('color', 'gray');
+
+wantedLine.append(spanElement, document.createTextNode(`!`));
+console.log(cont)
 */
