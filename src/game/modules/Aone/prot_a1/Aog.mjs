@@ -18,7 +18,7 @@ export default class AoneGenericClass
 
     sm = 0;
 
-    constructor(at = 45, rf = 11)
+    constructor(at = 645, rf = 11)
     {
         this.setPlayerStats(at, rf);
 
@@ -50,6 +50,8 @@ export default class AoneGenericClass
         // current meleeRound
         this.y = 0;
 
+        GUI.prepareLines(12);
+
         this.meleeRound();
         
     }
@@ -57,11 +59,17 @@ export default class AoneGenericClass
     meleeRound()
     {
         console.clear();
-        GUI.clear();
-        GUI.colored(`nm= ${this.nm}, am= ${this.am} `, `rf = ${this.rf}`, 0x893489).removeLineBreak().line(` AT= ${this.at}`);
-        GUI.mixed(`**** Turno di mischia ${++this.y} ****`, 0xda6450).addBR();
+        for (const elem of GUI.lineAry.values())
+        {
+            elem.replaceChildren("-");
+        }
 
-        GUI.line(`**** Sei in mischia con ${this.nm === 1? 'un solo avversario: ****': `${this.nm} avversari: ****`}`).addBR(2);
+        // GUI.mixed(`**** Turno di mischia ${++this.y} ****`, 0xda6450).addBR();
+        GUI.fillLine(0, `**** Sei in mischia con ${this.nm === 1? 'un solo avversario: ****': `${this.nm} avversari: ****`}`);
+        //GUI.line(.addBR(2);
+
+        // clear enemies 'slots'
+
 
         // enemies attack loop
         for (let j = 1; j <= this.nm; j++)
@@ -73,7 +81,7 @@ export default class AoneGenericClass
             if (this.am < cm)
             {
                 // miss
-                GUI.mixed(`${GUI.emoji.enemyMisses} L'avversario `, `#${j}`, 0xababab, ` sbaglia il colpo`);
+                GUI.fillLine(j, `${GUI.emoji.enemyMisses} L'avversario `, `#${j}`, 0xababab, ` sbaglia il colpo`);
 
             }
             else //(this.am >= cm)
@@ -91,26 +99,28 @@ export default class AoneGenericClass
                 {
                     const woundAmount = (Math.floor(this.am / 20) >= cm)? Math.min(2, this.nm): 1;
 
-                    GUI.mixed(`${GUI.emoji.enemyHits.repeat(woundAmount)} L'avversario `, `#${j} `, 0x894343, `ti fa `, `${woundAmount} `, 0x565656, woundAmount===1? `ferita`:`ferite`);
+                    GUI.fillLine(j, `${GUI.emoji.enemyHits.repeat(woundAmount)} L'avversario `, `#${j} `, 0x894343, `ti fa `, `${woundAmount} `, 0x565656, woundAmount===1? `ferita`:`ferite`);
 
                     this.rf -= woundAmount;
                 }
                 else
                 {
-                    GUI.mixed(`${GUI.emoji.enemyParried}`, `Parato`, 0x676767, ` il colpo del #${j} avversario`);
+                    GUI.fillLine(j, `${GUI.emoji.enemyParried}`, `Parato`, 0x676767, ` il colpo del #${j} avversario`);
                 }
 
             }
             
-            GUI.addBR(this.totalMeleeEnemies - this.nm + 1);
+            //GUI.addBR(this.totalMeleeEnemies - this.nm + 1);
         } // enemies attack loop
+
+        let currLine = this.totalMeleeEnemies + 2;
 
         // player attaks
         const cc = (this.nm > 1)? Math.floor(this.at / 15): 0;
         const ap = this.diceRoll();
         if (this.at < ap)
         {
-            GUI.line(`${GUI.emoji.playerMisses} Hai mancato il tuo colpo`);
+            GUI.fillLine(currLine++, `${GUI.emoji.playerMisses} Hai mancato il tuo colpo`);
         }
         else
         {
@@ -118,7 +128,7 @@ export default class AoneGenericClass
 
             if (this.sm >= xs)
             {
-                GUI.line(`${GUI.emoji.enemyMisses} L'avversario ha scansato tuo colpo`);
+                GUI.fillLine(currLine++, `${GUI.emoji.enemyMisses} L'avversario ha scansato tuo colpo`);
             }
             else
             {
@@ -128,13 +138,13 @@ export default class AoneGenericClass
 
                     this.nm -= tempKilled;
 
-                    GUI.line(`${GUI.emoji.playerKillsTwo} Hai ucciso ${tempKilled} avversari`);
+                    GUI.fillLine(currLine++,`${GUI.emoji.playerKillsTwo} Hai ucciso ${tempKilled} avversari`);
                 }
                 else
                 {
                     this.nm -= 1;
 
-                    GUI.line(`${GUI.emoji.playerKills} Hai ucciso ${this.nm <= 0? "l'ultimo":"un"} avversario`);//${GUI.emoji.bug} ALTRO`);//Hai ucciso ${tempKilled} avversari`);
+                    GUI.fillLine(currLine++, `${GUI.emoji.playerKills} Hai ucciso ${this.nm <= 0? "l'ultimo":"un"} avversario`);
                 }
 
             }
@@ -143,7 +153,7 @@ export default class AoneGenericClass
         // 14350 gosub200
         // 14360 if rf <= 0 then rf = 0
         // 14370 print"{down}la tua robustezza e' ora "rf: gosub240
-        GUI.addBR().line(`La tua robustezza è ora ${this.rf}`);
+        GUI.fillLine(currLine++, `La tua robustezza è ora ${this.rf}`);
 
         // 14400 if rf <= 0 then print"{down}Sei morto !{160}!{160}!{160}!{160}!{160}!": rem syss + 18: goto 12210
         // 14410 if nm = 0 then 14740
@@ -184,13 +194,13 @@ export default class AoneGenericClass
         if (this.nm <= 0)
         {
             document.getElementById("btn2").hidden = true;
-            return GUI.addBR(2).line(`${GUI.emoji.cup} Hai vinto! (rf = ${this.rf} | avversari ora: ${this.nm})`);
+            return GUI.fillLine(GUI.lineAry.length - 1, `${GUI.emoji.cup} Hai vinto! (rf = ${this.rf} | avversari ora: ${this.nm})`);
         }
         if (this.rf <= 0)
         {
             //document.getElementById("btn2").removeEventListener("pointerdown");
             document.getElementById("btn2").hidden = true;
-            return GUI.addBR(2).line(`${GUI.emoji.lose} Hai PERSO! (rf = ${this.rf} | avversari ora: ${this.nm})`);
+            return GUI.fillLine(GUI.lineAry.length - 1, `${GUI.emoji.lose} Hai PERSO! (rf = ${this.rf} | avversari ora: ${this.nm})`);
         }
 
     } // end meleeRound method
@@ -262,7 +272,9 @@ export default class AoneGenericClass
         
         // 12830 return
         this.nm = nm;
+
         this.am = am;
+
         this.totalMeleeEnemies = nm;
 
         return; // {x, xy, nm, am};

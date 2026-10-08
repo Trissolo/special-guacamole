@@ -2,6 +2,8 @@ export default class GUI
 {
     static container = document.getElementById('container');
 
+    static lineAry = [];
+
     static emoji = {
         bug: `🐛`,
         debugInfo: '💬',
@@ -113,6 +115,54 @@ export default class GUI
         }
 
         return GUI.addBR(2);
+    }
+
+    static fillLine(idx = 0, ...params)
+    {
+        if (params.length === 0) return;
+        const line = this.lineAry[idx];
+        if (line === undefined) return
+        line.replaceChildren()
+
+        for (let i = 0; i < params.length; i++)
+        {
+            const current = params[i];
+            const next = params[i + 1];
+
+            if (typeof next === 'number')
+            {
+                line.appendChild(GUI.makeSpan(current, params[++i]));
+
+                //i++; // Skip the color index on the next iteration
+            }
+            else
+            {
+                line.appendChild(GUI.makeSpan(current, false));
+            }
+        }
+
+        return GUI;
+    }
+    
+    static prepareLines(lines = 10)
+    {
+    	const {lineAry: ary} = GUI;
+        ary.length = 0;
+        
+        GUI.clear()
+        
+        
+        for (let i = 0; i < lines; i++)
+        {
+        	const line = document.createElement('pre');
+            line.appendChild(GUI.makeTextNode(`[line #${i}]`));
+            ary.push(line);
+            GUI.container.appendChild(line);
+            //console.log(line);
+        }
+        //console.log(ary, GUI.container);
+        
+        return GUI;
     }
 
     // alternativeTextColor(...params)
