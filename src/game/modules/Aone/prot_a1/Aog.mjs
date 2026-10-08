@@ -18,7 +18,7 @@ export default class AoneGenericClass
 
     sm = 0;
 
-    constructor(at = 645, rf = 11)
+    constructor(at = 45, rf = 11)
     {
         this.setPlayerStats(at, rf);
 
@@ -58,14 +58,15 @@ export default class AoneGenericClass
 
     meleeRound()
     {
-        console.clear();
-        for (const elem of GUI.lineAry.values())
-        {
-            elem.replaceChildren("-");
-        }
+        GUI.clear();
+        // console.clear();
+        // for (const elem of GUI.lineAry.values())
+        // {
+        //     elem.replaceChildren("-");
+        // }
 
-        // GUI.mixed(`**** Turno di mischia ${++this.y} ****`, 0xda6450).addBR();
-        GUI.fillLine(0, `**** Sei in mischia con ${this.nm === 1? 'un solo avversario: ****': `${this.nm} avversari: ****`}`);
+        GUI.addHeader(`Turno di mischia ${++this.y}`);
+        GUI.mixedLine(`**** Sei in mischia con ${this.nm === 1? 'un solo avversario: ****': `${this.nm} avversari: ****`}`);
         //GUI.line(.addBR(2);
 
         // clear enemies 'slots'
@@ -81,7 +82,7 @@ export default class AoneGenericClass
             if (this.am < cm)
             {
                 // miss
-                GUI.fillLine(j, `${GUI.emoji.enemyMisses} L'avversario `, `#${j}`, 0xababab, ` sbaglia il colpo`);
+                GUI.mixedLine(`${GUI.emoji.enemyMisses} L'avversario `, `#${j}`, 0xababab, ` sbaglia il colpo`);
 
             }
             else //(this.am >= cm)
@@ -99,20 +100,20 @@ export default class AoneGenericClass
                 {
                     const woundAmount = (Math.floor(this.am / 20) >= cm)? Math.min(2, this.nm): 1;
 
-                    GUI.fillLine(j, `${GUI.emoji.enemyHits.repeat(woundAmount)} L'avversario `, `#${j} `, 0x894343, `ti fa `, `${woundAmount} `, 0x565656, woundAmount===1? `ferita`:`ferite`);
+                    GUI.mixedLine(`${GUI.emoji.enemyHits.repeat(woundAmount)} L'avversario `, `#${j} `, 0x894343, `ti fa `, `${woundAmount} `, 0x565656, woundAmount===1? `ferita`:`ferite`);
 
                     this.rf -= woundAmount;
                 }
                 else
                 {
-                    GUI.fillLine(j, `${GUI.emoji.enemyParried}`, `Parato`, 0x676767, ` il colpo del #${j} avversario`);
+                    GUI.mixedLine(`${GUI.emoji.enemyParried}`, ` Parato`, 0x676767, ` il colpo del #${j} avversario`);
                 }
 
             }
             
-            //GUI.addBR(this.totalMeleeEnemies - this.nm + 1);
         } // enemies attack loop
-
+        
+        GUI.addBR();
         let currLine = this.totalMeleeEnemies + 2;
 
         // player attaks
@@ -120,7 +121,7 @@ export default class AoneGenericClass
         const ap = this.diceRoll();
         if (this.at < ap)
         {
-            GUI.fillLine(currLine++, `${GUI.emoji.playerMisses} Hai mancato il tuo colpo`);
+            GUI.mixedLine(`${GUI.emoji.playerMisses} Hai mancato il tuo colpo`);
         }
         else
         {
@@ -128,7 +129,7 @@ export default class AoneGenericClass
 
             if (this.sm >= xs)
             {
-                GUI.fillLine(currLine++, `${GUI.emoji.enemyMisses} L'avversario ha scansato tuo colpo`);
+                GUI.mixedLine(`${GUI.emoji.enemyMisses} L'avversario ha scansato tuo colpo`);
             }
             else
             {
@@ -138,13 +139,13 @@ export default class AoneGenericClass
 
                     this.nm -= tempKilled;
 
-                    GUI.fillLine(currLine++,`${GUI.emoji.playerKillsTwo} Hai ucciso ${tempKilled} avversari`);
+                    GUI.mixedLine(`${GUI.emoji.playerKillsTwo} Hai ucciso ${tempKilled} avversari`);
                 }
                 else
                 {
                     this.nm -= 1;
 
-                    GUI.fillLine(currLine++, `${GUI.emoji.playerKills} Hai ucciso ${this.nm <= 0? "l'ultimo":"un"} avversario`);
+                    GUI.mixedLine(`${GUI.emoji.playerKills} Hai ucciso ${this.nm <= 0? "l'ultimo":"un"} avversario`);
                 }
 
             }
@@ -153,7 +154,8 @@ export default class AoneGenericClass
         // 14350 gosub200
         // 14360 if rf <= 0 then rf = 0
         // 14370 print"{down}la tua robustezza e' ora "rf: gosub240
-        GUI.fillLine(currLine++, `La tua robustezza è ora ${this.rf}`);
+        GUI.addBR();
+        GUI.mixedLine(`La tua robustezza è ora ${this.rf}`);
 
         // 14400 if rf <= 0 then print"{down}Sei morto !{160}!{160}!{160}!{160}!{160}!": rem syss + 18: goto 12210
         // 14410 if nm = 0 then 14740

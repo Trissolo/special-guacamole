@@ -1,27 +1,45 @@
 <!DOCTYPE html>
 <html>
 <style>
-pre {
-/*height: 11em;*/
-/*min-height: 11em;*/ /**min-content;*/
-/*font-size: x-large;*/
-/*text-align: justify;*/
-/*font-family: monospace;*/
-font-family: monospace; /* Mantiene il font a spaziatura fissa */
-font-size: 16px;        /* Blocca la dimensione del font */
-line-height: 24px;      /* Forza l'altezza di ogni singola riga a 24px */
-/*white-space: pre;/*
+    #container {
+        background-color: blue;
+        height: 400px;
+        color: white;
+        padding: 1em;
+    }
 
-margin: 0;              /* Rimuove i margini verticali predefiniti */
-padding: 0;             /* Rimuove il padding interno */
-}
+    h3 {
+        color: darkblue;
+        background-color: white;
+        width: 20em;
+        text-align: center;
+        /*padding-left: 4em;*/
+        /*padding-right: 4em;*/
+    }
+
+    pre {
+    /*height: 11em;*/
+    /*min-height: 11em;*/ /**min-content;*/
+    /*font-size: x-large;*/
+    /*text-align: justify;*/
+    /*font-family: monospace;*/
+        font-family: monospace; /* Mantiene il font a spaziatura fissa */
+        font-size: 16px;        /* Blocca la dimensione del font */
+        line-height: 24px;      /* Forza l'altezza di ogni singola riga a 24px */
+        padding: 0;             /* Rimuove il padding interno */
+    /*white-space: pre;/*
+
+    margin: 0;              /* Rimuove i margini verticali predefiniti */
+    }
 </style>
     <body>
 
         <h2>Avventura 1</h2>
+        <div>
+            <pre id="container"></pre>
 
-        <pre id="container"></pre>
-        <button id="btn2">Continue fight</button>
+            <button id="btn2">Continue fight</button>
+        </div>
 
         <script type="module" src="game_a1.mjs"></script>
 

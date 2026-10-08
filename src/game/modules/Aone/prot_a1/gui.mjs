@@ -93,7 +93,18 @@ export default class GUI
         return GUI;
     }
 
-    static mixed(...params)
+    static addHeader(text)
+    {
+        const h3 = document.createElement('h3');
+
+        h3.appendChild(GUI.makeTextNode(text));
+
+        GUI.container.appendChild(h3);
+
+        return GUI;
+    }
+
+    static mixedLine(...params)
     {
         if (params.length === 0) return;
 
@@ -114,15 +125,15 @@ export default class GUI
             }
         }
 
-        return GUI.addBR(2);
+        return GUI.addBR();
     }
 
     static fillLine(idx = 0, ...params)
     {
-        if (params.length === 0) return;
-        const line = this.lineAry[idx];
-        if (line === undefined) return
-        line.replaceChildren()
+        //if (params.length === 0) return;
+        const line = GUI.container//this.lineAry[idx];
+        //if (line === undefined) return
+        //line.replaceChildren()
 
         for (let i = 0; i < params.length; i++)
         {
@@ -141,7 +152,9 @@ export default class GUI
             }
         }
 
-        return GUI;
+        return GUI.addBR();
+
+        // return GUI;
     }
     
     static prepareLines(lines = 10)
