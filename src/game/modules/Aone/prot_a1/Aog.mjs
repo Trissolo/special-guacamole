@@ -66,11 +66,6 @@ export default class AoneGenericClass
         // enemies attack loop
         for (let j = 1; j <= this.nm; j++)
         {
-            const pa = this.nm >= 4? Math.floor(this.at / 4) : Math.floor(this.at / this.nm) + 10;
-            
-            // 
-            let cs = 0;
-            
             // random dice roll for 'colpo mancato' ('missing hit')
             const cm = this.diceRoll();
     
@@ -86,8 +81,11 @@ export default class AoneGenericClass
                 // contact happens!
                 // now... wound or parried?
 
+                const pa = this.nm >= 4? Math.floor(this.at / 4) : Math.floor(this.at / this.nm) + 10;
+
                 // random dice roll for 'player parry'
                 const pp = this.diceRoll();
+                //  console.log(`Sei stato colpito dal emico: pa = ${pa}, pp = ${pp} ${pa < pp? "Ferito": "Parato!"}`)
 
                 if (pa < pp) // 
                 {
