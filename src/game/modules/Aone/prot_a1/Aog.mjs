@@ -14,7 +14,7 @@ export default class AoneGenericClass
     // attack value for monster in melee
     am = 0;
 
-    xf = 0;
+    // xf = 0;
 
     sm = 0;
 
@@ -48,13 +48,10 @@ export default class AoneGenericClass
         this.fu = 0;
 
         // current meleeRound
-        this.y = 1;
+        this.y = 0;
 
         this.meleeRound();
-
         
-
-
     }
 
     meleeRound()
@@ -63,7 +60,7 @@ export default class AoneGenericClass
         GUI.clear();
         GUI.colored(`nm= ${this.nm}, am= ${this.am} `, `rf = ${this.rf}`, 0x893489).removeLineBreak().line(` AT= ${this.at}`);
         // 13920 print"{rvon}      "y"{left}'  turno di mischia       {rvof}"
-        GUI.line(`${this.y++}° turno di mischia`).addBR(2);
+        GUI.mixed(`**** Turno di mischia ${++this.y} ****`, 0xda6450).addBR();
         // 13950 if nm = 1 then print"{down}Sei in mischia con un solo avversario{down}": goto 13990
         // 13960 print"{down}Sei in mischia con"nm"avversari{down}"
 
@@ -86,10 +83,10 @@ export default class AoneGenericClass
             let cs = 0;
             
             // potential wounds inflicted by current enemy
-            if (this.nm >= 4)
-            {
-                this.xf = 1;
-            }
+            // if (this.nm >= 4)
+            // {
+            //     this.xf = 1;
+            // }
 
             // random dice roll for 'colpo mancato' ('missing hit')
             // 14060 cm = int(100 * rnd(0)) + 1
@@ -113,50 +110,51 @@ export default class AoneGenericClass
 
             }
             // 14100 if am >= cm and pa < pp then cs = 1
-            else
+            else //(this.am >= cm)
             {
-                // contact
+                // contact happens!
+                // now... wound or parried?
 
-                // wound
-                if (pa < pp)
+                if (pa < pp) // 
                 {
-                    cs = 1;
-                }
+                    const woundAmount = (Math.floor(this.am / 20) >= cm)? Math.min(2, this.nm): 1;
+                    // GUI.mixed("DEBUG XF-WOUNDAMOUNT: ", 0x00ffff, `${woundAmount}`, ` (Turno ${this.y})`, 0x346734);
+                    //cs = 1;
+                    // 14110 cc = int(am / 20)
+                    //cc = Math.floor(this.am / 20);
+                    // 14120 if cc >= cm then xf = 2
+                    // if (Math.floor(this.am / 20) >= cm)
+                    // {
+                    //     //this.xf = 2;
+                    //     woundAmount = Math.min(2, this.nm);
+                    // }
 
-                // 14110 cc = int(am / 20)
-                cc = Math.floor(this.am / 20);
-                // 14120 if cc >= cm then xf = 2
-                if (cc >= cm)
-                {
-                    this.xf = 2;
-                }
+                    // GUI.colored("CS=", cs, 0x89aa89).removeLineBreak().colored("  XF=", this.xf, 0xba6767);
+                    // 14130 if cs = 1 and xf = 1 then print"*";: printj;: print"'avversario ti fa {rvon}1 ferita{rvof}": rf = rf - 1: goto 14190
+                    // 14140 if cs = 1 and xf = 2 then print"*";: printj;: print"'avversario ti fa {rvon}2 ferite{rvof}": rf = rf - 2: goto 14190
+                    //if (woundAmount)
+                    //{
+                        //const woundAmount = Math.min(2, this.xf);
 
-                // GUI.colored("CS=", cs, 0x89aa89).removeLineBreak().colored("  XF=", this.xf, 0xba6767);
-                // 14130 if cs = 1 and xf = 1 then print"*";: printj;: print"'avversario ti fa {rvon}1 ferita{rvof}": rf = rf - 1: goto 14190
-                // 14140 if cs = 1 and xf = 2 then print"*";: printj;: print"'avversario ti fa {rvon}2 ferite{rvof}": rf = rf - 2: goto 14190
-                if (cs === 1 && this.xf > 0)
-                {
-                    const woundAmount = Math.min(2, this.xf);
+                        GUI.mixed(`${GUI.emoji.enemyHits.repeat(woundAmount)} L'avversario `, `#${j} `, 0x894343, `ti fa `, `${woundAmount} `, 0x565656, woundAmount===1? `ferita`:`ferite`);
 
-                    GUI.mixed(`${GUI.emoji.enemyHits.repeat(woundAmount)} L'avversario `, `#${j} `, 0x894343, `ti fa `, `${woundAmount} `, 0x565656, woundAmount===1? `ferita`:`ferite`);
-
-                    this.rf -= woundAmount;
+                        this.rf -= woundAmount;
+                    //}
                 }
                 else
                 {
                     // 14150 if nm = 1 then print"{grn}*{wht} Parato il colpo dell' avversario": goto 14190
                     // 14160 print"{grn}*{wht} Parato colpo del"j"'avversario"
-                    GUI.line(`${GUI.emoji.enemyParried} Parato colpo del #${j} avversario`).addBR();
+                    GUI.mixed(`${GUI.emoji.enemyParried}`, `Parato`, 0x676767, ` il colpo del #${j} avversario`);
                 }
-
 
             }
             
-            this.xf = 1;
+            //this.xf = 1;
+            GUI.addBR(this.totalMeleeEnemies - this.nm + 1);
         } // enemies attack loop
 
         // player attaks
-        GUI.line("-----").addBR(2);
         // 14190 xf = 1: next: cc = 0: ifnm > 1 then cc = int(at / 15): gosub240
         cc = (this.nm > 1)? Math.floor(this.at / 15): 0;
         // 14230 if ks > 0 then 14250
@@ -169,7 +167,7 @@ export default class AoneGenericClass
         let ts = 0;
         if (this.at < ap)
         {
-            GUI.line("Hai mancato il tuo colpo");
+            GUI.line(`${GUI.emoji.playerMisses} Hai mancato il tuo colpo`);
         }
         else
         {
@@ -184,24 +182,24 @@ export default class AoneGenericClass
             {
                 // 14300 if at >= ap then ts = 1
                 ts = 1;
-                if (ts === 1) 
-                {
+                // if (ts === 1) 
+                // {
                     if (cc >= ap)
                     {
 
                     
                         const tempKilled = Math.min(2, this.nm);
+                        this.nm -= tempKilled;
                         // 14310 if ts = 1 and cc >= ap then print"{down}^^ Hai ucciso {rvon}due{rvof} avversari": nm = nm - 2: goto 14350
                         GUI.line(`${GUI.emoji.playerKillsTwo} Hai ucciso ${tempKilled} avversari`);
-                        this.nm -= tempKilled;
                     }
                     else
                     {
-                        GUI.line(`${GUI.emoji.playerKills} Hai ucciso un avversario`);//${GUI.emoji.bug} ALTRO`);//Hai ucciso ${tempKilled} avversari`);
                         this.nm -= 1;
+                        GUI.line(`${GUI.emoji.playerKills} Hai ucciso ${this.nm <= 0? "l'ultimo":"un"} avversario`);//${GUI.emoji.bug} ALTRO`);//Hai ucciso ${tempKilled} avversari`);
                     }
 
-                }
+                //}
 
                 // 14320 if nm = 1 then 14340
                 // 14330 if ts = 1 and cc < ap then print"{down}^ Hai ucciso  un  avversario": nm = nm - 1: goto 14350
@@ -332,6 +330,7 @@ export default class AoneGenericClass
         // 12830 return
         this.nm = nm;
         this.am = am;
+        this.totalMeleeEnemies = nm;
 
         return; // {x, xy, nm, am};
     }

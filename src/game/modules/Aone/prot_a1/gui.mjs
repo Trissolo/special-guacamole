@@ -8,6 +8,7 @@ export default class GUI
         enemyHits: '💥',
         enemyMisses: '💨',
         enemyParried: '🛡️',
+        playerMisses: "👎",
         playerKillsTwo: "⚔️",
         playerKills: "🗡️",
         cup: "🏆",
