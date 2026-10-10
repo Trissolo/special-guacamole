@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C64 Combat Simulator</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #game-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: #000000;
+            border: 2px solid #333;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        #console-log {
+            height: 350px;
+            overflow-y: auto;
+            border: 1px solid #222;
+            padding: 10px;
+            background-color: #050505;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        button {
+            background-color: #4a148c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+        button:hover {
+            background-color: #7b1fa2;
+        }
+        button:disabled {
+            background-color: #333;
+            color: #777;
+            cursor: not-allowed;
+        }
+        /* Classi di stile per emulare i colori C64 */
+        .reverse { background-color: #e0e0e0; color: #000; padding: 0 2px; }
+        .yellow { color: #fbc02d; }
+        .green { color: #4caf50; }
+        .purple { color: #e040fb; }
+        .white { color: #ffffff; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="console-log"></div>
+    <div class="controls">
+        <button id="action-btn" onclick="gestisciTurno()">Inizia Battaglia</button>
+    </div>
+</div>
+
+<script>
+    const logElement = document.getElementById('console-log');
+    const buttonElement = document.getElementById('action-btn');
+
+    // Stato del gioco (Variabili originali)
+    let at = 94;
+    let rf = 10;
+    let xf = 1;
+    let sm = 10;
+    let y = 1;
+
+    let nm = 0;
+    let am = 0;
+    let nm_str = "";
+    let a_str = "0";
+    let giocoFinito = false;
+    let battagliaIniziata = false;
+
+    // Funzione custom per stampare a schermo con supporto a pseudo-tag di stile
+    function printLog(text) {
+        const line = document.createElement('div');
+        // Converte i marcatori in classi HTML reali
+        let formatted = text
+            .replace(/\{rvon\}(.*?)\{rvof\}/g, '<span class="reverse">\$1</span>')
+            .replace(/\{yel\}/g, '<span class="yellow">')
+            .replace(/\{grn\}/g, '<span class="green">')
+            .replace(/\{wht\}/g, '<span class="white">')
+            .replace(/\{pur\}/g, '<span class="purple">')
+            .replace(/\{end\}/g, '</span>');
+        
+        line.innerHTML = formatted;
+        logElement.appendChild(line);
+        logElement.scrollTop = logElement.scrollHeight; // Auto-scroll verso il basso
+    }
+
+    // Generatore di numeri casuali interi
+    const rndInt = (max) => Math.floor(Math.random() * max);
+
+    // Sottoprogramma Riga 11000
+    function generaStatisticheMostri() {
+        let x = 0;
+        let xy = 1;
+        sm = 10;
+
+        if (at <= 100) { x = 2; xy = 1; }
+        else if (at > 100 && at < 150) { x = 2; xy = 1.2; }
+        else if (at > 150) { x = 4; xy = 2; }
+        else if (at > 200) { x = 6; xy = 3.5; }
+
+        nm = rndInt(x) + 3;
+        am = Math.floor((rndInt(41 - nm) + 21) * xy);
+        if (am > 95) am = 95;
+    }
+
+    // Sottoprogramma Riga 12000
+    function generaTipoMostro() {
+        a_str = "0";
+        let x = rndInt(12) + 1;
+
+        switch (x) {
+            case 1: nm_str = " Elfi "; a_str = "1"; break;
+            case 2: nm_str = " Uomini Uccello "; a_str = "1"; break;
+            case 3: nm_str = " Droll "; break;
+            case 4: nm_str = " Pentauri "; a_str = "1"; break;
+            case 5: nm_str = " Orchi cattivi "; break;
+            case 6: nm_str = " Uomini Lupo "; a_str = "1"; break;
+            case 7: nm_str = " Serpenti alati "; break;
+            case 8: nm_str = " Ragni pelosi "; break;
+            case 9: nm_str = " Orchi "; break;
+            case 10: nm_str = " Gnomi "; a_str = "1"; break;
+            case 11: nm_str = " Nani giganti "; a_str = "1"; break;
+            default: nm_str = " Zombi "; break;
+        }
+    }
+
+    // Funzione principale legata al click del bottone
+    function gestisciTurno() {
+        if (giocoFinito) return;
+
+        // Setup iniziale al primo click
+        if (!battagliaIniziata) {
+            generaStatisticheMostri();
+            generaTipoMostro();
+            battagliaIniziata = true;
+            buttonElement.innerText = "Prossimo Turno";
+        }
+
+        eseguiTurnoMischia();
+    }
+
+    // Logica di mischia (Ex riga 21000) adattata per avanzare un click alla volta
+    function eseguiTurnoMischia() {
+        printLog(`{rvon}      Turno di mischia n. ${y}       {rvof}`);
+        
+        if (nm === 1) {
+            printLog("<br>Sei in mischia con un solo avversario<br>");
+        } else {
+            printLog(`<br>Sei in mischia con ${nm} avversari<br>`);
+        }
+
+        // Attacco dei Mostri
+        for (let j = 1; j <= nm; j++) {
+            let pa = 0;
+            let cs = 0;
+            xf = 1;
+
+            if (nm >= 4) {
+                pa = Math.floor(at / 4);
+                cs = 0;
+            } else {
+                pa = Math.floor(at / nm) + 10;
+                cs = 0;
+                xf = 1;
+            }
+
+            let cm = rndInt(100) + 1;
+            let pp = rndInt(100) + 1;
+
+            if (am < cm && nm === 1) {
+                printLog(`{yel}*{wht} L' avversario sbaglia il colpo{end}{end}`);
+                continue; 
+            }
+            if (am < cm) {
+                printLog(`{yel}*{wht} Il mostro n. ${j} sbaglia il colpo{end}{end}`);
+                continue;
+            }
+
+            if (am >= cm && pa < pp) {
+                cs = 1;
+            }
+
+            let cc_calc = Math.floor(am / 20);
+            if (cc_calc >= cm) {
+                xf = 2;
+            }
+
+            if (cs === 1 && xf === 1) {
+                printLog(`* Il mostro n. ${j} ti fa {rvon}1 ferita{rvof}`);
+                rf = rf - 1;
+                continue;
+            }
+            if (cs === 1 && xf === 2) {
+                printLog(`* Il mostro n. ${j} ti fa {rvon}2 ferite{rvof}`);
+                rf = rf - 2;
+                continue;
+            }
+
+            if (nm === 1) {
+                printLog(`{grn}*{wht} Parato il colpo dell' avversario{end}{end}`);
+            } else {
+                printLog(`{grn}*{wht} Parato colpo del mostro n. ${j}{end}{end}`);
+            }
+        }
+
+        // Contrattacco del Giocatore (Ex riga 22000)
+        let cc = nm > 1 ? Math.floor(at / 15) : 0;
+
+        let ap = rndInt(100) + 1;
+        if (at < ap) {
+            printLog("<br>Hai mancato il tuo colpo");
+        } else {
+            let xs = rndInt(100) + 1;
+            if (at >= ap && sm >= xs) {
+                printLog("<br>L'avversario ha scansato il tuo colpo");
+            } else {
+                let ts = (at >= ap) ? 1 : 0;
+
+                if (ts === 1 && cc >= ap) {
+                    printLog(`<br>^^ Hai ucciso {rvon}due{rvof} avversari`);
+                    nm = nm - 2;
+                } else if (nm === 1 && ts === 1 && cc < ap) {
+                    printLog(`<br>^ Hai ucciso l'ultimo avversario`);
+                    nm = nm - 1;
+                } else if (ts === 1 && cc < ap) {
+                    printLog(`<br>^ Hai ucciso un avversario`);
+                    nm = nm - 1;
+                }
+            }
+        }
+
+        // Controllo Robustezza / Vita (Ex riga 23000)
+        if (rf <= 0) rf = 0;
+        printLog(`<br>La tua robustezza è ora: ${rf}`);
+
+        if (rf <= 0) {
+            printLog("<br>{rvon}Sei morto !{rvof}");
+            concludiGioco();
+            return;
+        }
+
+        if (nm <= 0) {
+            printLog("<br>Hai ucciso tutti i tuoi avversari!");
+            printLog("Sei cresciuto del 3% di capacità di usare le armi!");
+            at = at + 3;
+            printLog("Puoi riprendere la tua avventura");
+            printLog(`Robustezza rimasta: ${rf} | Mostri vivi: 0`);
+            concludiGioco();
+            return;
+        }
+
+        if (nm > 1) printLog(`Gli avversari sono ora: ${nm}`);
+        if (nm === 1) printLog("Hai di fronte un solo avversario");
+
+        printLog("<br>----------------------------------------<br>");
+        y = y + 1;
+    }
+
+    function concludiGioco() {
+        giocoFinito = true;
+        buttonElement.disabled = true;
+        buttonElement.innerText = "Fine Partita";
+    }
+</script>
+
+</body>
+</html>

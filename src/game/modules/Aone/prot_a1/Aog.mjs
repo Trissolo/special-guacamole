@@ -18,7 +18,7 @@ export default class AoneGenericClass
 
     sm = 0;
 
-    constructor(at = 45, rf = 11)
+    constructor(at = 155, rf = 11)
     {
         this.setPlayerStats(at, rf);
 
@@ -77,7 +77,7 @@ export default class AoneGenericClass
         {
             // random dice roll for 'colpo mancato' ('missing hit')
             const cm = this.diceRoll();
-    
+            GUI.mixedLine(`${this.am}`, 0x89a954, " > ", `${cm}`, 0x89a954, " Colpo: ", 0x767676, `${this.am < cm? "NO":  "--Sì--"}`);
             // contact or miss?
             if (this.am < cm)
             {
@@ -95,6 +95,8 @@ export default class AoneGenericClass
                 // random dice roll for 'player parry'
                 const pp = this.diceRoll();
                 //  console.log(`Sei stato colpito dal emico: pa = ${pa}, pp = ${pp} ${pa < pp? "Ferito": "Parato!"}`)
+
+                GUI.mixedLine(`${j}/${this.nm}`, 0xacacff, ` |pa < pp| `, 0x898989, `** ${pa} < ${pp} ** `, (pa<pp)?GUI.emoji.bug:0xff3322); //` pa= ${pa}`, 0x89ba89, ` pp=${pp} `, 0xba8989, ` cm=`, `${cm} `, 0xcaca78, `${Math.floor(this.am / 20) >= cm}`, 0xaaffff);
 
                 if (pa < pp) // 
                 {
@@ -196,13 +198,13 @@ export default class AoneGenericClass
         if (this.nm <= 0)
         {
             document.getElementById("btn2").hidden = true;
-            return GUI.fillLine(GUI.lineAry.length - 1, `${GUI.emoji.cup} Hai vinto! (rf = ${this.rf} | avversari ora: ${this.nm})`);
+            return GUI.addBR(2).mixedLine(`${GUI.emoji.cup} Hai vinto! (rf = ${this.rf} | avversari ora: ${this.nm})`);
         }
         if (this.rf <= 0)
         {
             //document.getElementById("btn2").removeEventListener("pointerdown");
             document.getElementById("btn2").hidden = true;
-            return GUI.fillLine(GUI.lineAry.length - 1, `${GUI.emoji.lose} Hai PERSO! (rf = ${this.rf} | avversari ora: ${this.nm})`);
+            return GUI.addBR(3).mixedLine(`${GUI.emoji.lose} Hai PERSO! (rf = ${this.rf} | avversari ora: ${this.nm})`);
         }
 
     } // end meleeRound method
@@ -226,6 +228,16 @@ export default class AoneGenericClass
 
     calcMeleeValues(at = 80)
     {
+        // 'am' potential returned values:
+        // 21 / (53, 58)
+        // 25 / (63, 69)
+        // 42 / (106, 116)
+        // 73 / (185, 203)
+
+        // 21 / (53, 58)
+        // 25 / (63, 69)
+        // 42 / (106, 95)
+        // 73 / (185, 95) 
 
         // 12750 x=0:sm=10
         this.sm = 10;
