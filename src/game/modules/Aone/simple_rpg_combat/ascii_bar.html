@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dynamic HTML Progress Bar</title>
+    <style>
+        /* Styling the pre tag to look like a terminal window */
+        body {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        pre {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 18px;
+            background-color: #000000;
+            padding: 15px;
+            border-radius: 5px;
+            display: inline-block;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <h3>Loading HTML Component Modules...</h3>
+    
+    <!-- The targeted target element -->
+    <pre id="progress-container">[░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 0%</pre>
+    <script>
+
+        /**
+         * Draws a multi-portion progress bar inside an HTML element.
+         * @param {number} progress - A number between 0 and 100
+         * @param {Array} config - Array of objects containing { color, percentage }
+         * @param {HTMLElement} outputElement - The target HTML element
+         */
+        function drawHtmlProgressBar(progress, config, outputElement) {
+            const totalWidth = 32; // Character width of the progress bar
+            const currentProgress = Math.min(Math.max(progress, 0), 100);
+            const totalFilledChars = Math.round((currentProgress / 100) * totalWidth);
+            const ratio = totalWidth / 100;
+
+            // 1. Calculate the character sizes for each segment dynamically
+            let segments = [];
+            let allocatedChars = 0;
+
+            for (let i = 0; i < config.length; i++) {
+                let maxChars = Math.round(config[i].percentage * ratio);
+                allocatedChars += maxChars;
+
+                // Handle fractional rounding errors on the last segment
+                if (i === config.length - 1) {
+                    maxChars += (totalWidth - allocatedChars);
+                }
+
+                segments.push({
+                    color: config[i].color, // CSS color value (hex, rgb, or name)
+                    char: '█',
+                    maxChars: maxChars
+                });
+            }
+
+            // 2. Distribute the filled characters into HTML styled spans
+            let barString = '[';
+            let remainingFilled = totalFilledChars;
+
+            for (let i = 0; i < segments.length; i++) {
+                const segment = segments[i];
+                const filledInThisSegment = Math.min(remainingFilled, segment.maxChars);
+                
+                if (filledInThisSegment > 0) {
+                    // Wrap the block characters in a styled span tag instead of ANSI codes
+                    barString += `<span style="color: ${segment.color};">${segment.char.repeat(filledInThisSegment)}</span>`;
+                    remainingFilled -= filledInThisSegment;
+                }
+            }
+
+            // 3. Fill the remaining empty space with standard grey background blocks
+            const emptyChars = totalWidth - totalFilledChars;
+            barString += `<span style="color: #444;">${'░'.repeat(emptyChars)}</span>] ${currentProgress}%`;
+
+            // Update the DOM text content with raw HTML string parsing
+            outputElement.innerHTML = barString;
+        }
+
+        // --- Custom Configuration (Using Hex Values instead of ANSI codes) ---
+        const myProgressBarConfig = [
+            { color: '#ff5555', percentage: 5 },   // Red
+            { color: '#ffb86c', percentage: 20 },  // Yellow
+            { color: '#50fa7b', percentage: 35 },  // Green
+            { color: '#8be9fd', percentage: 30 },  // Cyan
+            { color: '#ff79c6', percentage: 10 }   // Magenta
+        ];
+
+        // Target target element selection
+        const container = document.getElementById('progress-container');
+
+        // --- Animation Engine Loop ---
+        let percent = 0;
+        const interval = setInterval(() => {
+            drawHtmlProgressBar(percent, myProgressBarConfig, container);
+            percent++;
+
+            if (percent > 100) {
+                clearInterval(interval);
+                // Simple string append to print a success text beneath the element
+                container.innerHTML += '\nDone!';
+            }
+        }, 40);
+    
+
+
+
+    </script>
+
+</body>
+</html>

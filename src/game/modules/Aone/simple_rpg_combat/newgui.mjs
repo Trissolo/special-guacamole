@@ -49,7 +49,7 @@ export default class GUI
         return document.createElement('br');
     }
 
-    static makeSpan(text, color = false)
+    static makeSpan(text, color)
     {
         const spanElement = document.createElement('span');
 
@@ -75,7 +75,7 @@ export default class GUI
         }
         else
         {
-            console.log("no color set")
+            console.log(`no color set for ${text}`);
         }
 
         return spanElement;
@@ -173,7 +173,7 @@ export default class GUI
             }
             else
             {
-                GUI.container.appendChild(GUI.makeSpanWithClass(current));
+                GUI.container.appendChild(GUI.makeTextNode(current));
             }
         }
 
