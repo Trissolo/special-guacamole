@@ -45,13 +45,13 @@ function resolveAttack(attacker, defender)
 
     const hitThreshold = Math.max(5, Math.min(95, baseThreshold));
 
+    const criticalRange = Math.max(1, Math.floor(hitThreshold * 0.10));
+    
+    const parryRange = hitThreshold + 20;
+    
     const roll = Math.floor(Math.random() * 100) + 1;
 
-    const criticalRange = Math.max(1, Math.floor(hitThreshold * 0.10));
-
-    const parryRange = hitThreshold + 20;
-
-    GUI.print(` baseThreshold: `, 5, `${baseThreshold}`, 21);
+    GUI.print(`${attacker.accuracy} - ${defender.defense}`, ` baseThreshold: `, 5, `${baseThreshold}`, 21);
     GUI.print(` criticalRange:  `, 8, `${criticalRange}`, 17);
     GUI.print(` hitThreshold:  `, 0, `${hitThreshold}`, 14);
     GUI.print(` parryRange:   `, 2, `${parryRange}`, 16);
@@ -80,7 +80,8 @@ function resolveAttack(attacker, defender)
 
     defender.hp = Math.max(0, defender.hp - mitigatedDamage);
 
-    GUI.print(`⚔️ ${attacker.name}`,3, ` attacks ${defender.name} -> Roll: `, `${roll}`, 14, ` (${outcome}). `);
+    GUI.print(`⚔️ ${attacker.name}`, 3, ` attacks ${defender.name} -> Roll: `, `${roll}`, 14, ` (${outcome}). `);
+    GUI.drawBar(criticalRange, hitThreshold, parryRange, roll);
 
     if (mitigatedDamage > 0)
     {

@@ -88,7 +88,7 @@ export default class GUI
 
     static removeLineBreak()
     {
-        GUI.container.removeChild(container.lastChild);
+        GUI.container.removeChild(GUI.container.lastChild);
 
         return GUI;
     }
@@ -152,7 +152,8 @@ export default class GUI
 
         GUI.cssRulesLength = myCustomSheet.cssRules.length;
       
-        console.log(GUI.cssRulesLength);
+        //console.log(GUI.cssRulesLength);
+        return GUI;
     }
 
     static print(...params)
@@ -179,15 +180,36 @@ export default class GUI
         return GUI.addBR();
     }
 
+    static drawBar(criticalRange, hitThreshold, parryRange, roll)
+	{
+        const totalLength = 30;
+        const sec = "█";
+        const ratio = totalLength / 100;
+        const colIndices = [5, 8, 0, 10];
+        const iterArr = [
+            criticalRange,
+            hitThreshold - criticalRange,
+            parryRange - hitThreshold,
+            100 - parryRange
+        ];
+
+        for (let i = 0; i < iterArr.length; i++)
+        {
+            GUI.print(sec.repeat( Math.round(iterArr[i] * ratio) ), colIndices[i])
+            .removeLineBreak();
+        }
+        return GUI.addBR().print(`${' '.repeat(Math.ceil(roll * ratio ))}▲`);
+
+	}
+
     static destroy()
     {
         GUI.container = undefined;
-        console.log("GUI Destroyed)");
+        //console.log("GUI Destroyed)");
     }
 }
 
 // GUI.customCSSClasses();
-// GUI.print(`max= ${GUI.cssRulesLength}`, 1, "qwe", 1, " Asdft", 29);
 // for (let i = 0; i < GUI.cssRulesLength; i++)
 // {
 //     GUI.print(`[${i.toString().padStart(2, " ")}] --->  `, "Test String", i);
