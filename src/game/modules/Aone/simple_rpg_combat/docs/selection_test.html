@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<style>
+textarea {
+  max-height: 130px;
+  max-width: 500px;
+}
+
+</style>
+<body>
+
+<textarea name="textarea" rows="5" cols="15">Write something here</textarea>
+
+<pre id ="result"></pre>
+
+<button id="btn" type="button">Select</button>
+
+<script>
+const btn = document.getElementById("btn");
+function listener(e)
+{
+  const sel = document.getSelection();
+  console.log(sel);
+  document.getElementById("result").innerHTML = sel;// .getRangeAt(0);
+}
+btn.addEventListener('click', listener);
+</script>
+
+</body>
+</html>
+
+<!--
+<label for="text-box">Select some text:</label>
+<textarea id="text-box" rows="3">The quick brown fox.</textarea>
+<button id="show-selection" type="button">Show selection</button>
+<p id="output">No selection reported yet.</p>
+
+<script>
+    const textBox = document.querySelector("#text-box");
+    const output = document.querySelector("#output");
+
+    document.querySelector("#show-selection").addEventListener("click", () => {
+    const start = textBox.selectionStart;
+    const end = textBox.selectionEnd;
+    const selectedText = textBox.value.substring(start, end);
+
+    output.textContent = `You selected "${selectedText}" (start: ${start}, end: ${end}).`;
+    });
+</script>
+-->
