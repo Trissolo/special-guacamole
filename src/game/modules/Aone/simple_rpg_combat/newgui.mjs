@@ -3,7 +3,10 @@ export default class GUI
     static container = document.getElementById('container');
 
     static cssPrefix = "css";
+
     static cssRulesLength = 0;
+
+    static barUnit = "█";
 
     static emoji = {
         bug: `🐛`,
@@ -28,6 +31,8 @@ export default class GUI
             c.style.setProperty('background-color', '#000000');
 
             c.style.setProperty('font-size', 'x-large');
+
+            c.style.setProperty('height', '40em');
     
             document.body = document.createElement("body");
 
@@ -49,19 +54,19 @@ export default class GUI
         return document.createElement('br');
     }
 
-    static makeSpan(text, color)
-    {
-        const spanElement = document.createElement('span');
+    // static makeSpan(text, color)
+    // {
+    //     const spanElement = document.createElement('span');
 
-        spanElement.appendChild(GUI.makeTextNode(text));
+    //     spanElement.appendChild(GUI.makeTextNode(text));
 
-        if (color < GUI.cssRulesLength)
-        {
-            spanElement.style.setProperty('color', GUI._numberToHexColor(color));
-        }
+    //     if (Number.isFinite(color)) //< GUI.cssRulesLength)
+    //     {
+    //         spanElement.style.setProperty('color', GUI._numberToHexColor(color));
+    //     }
 
-        return spanElement;
-    }
+    //     return spanElement;
+    // }
 
     static makeSpanWithClass(text, cssClass)
     {
@@ -73,10 +78,6 @@ export default class GUI
         {
             spanElement.classList.add(`${GUI.cssPrefix}${cssClass}`);
         }
-        else
-        {
-            console.log(`no color set for ${text}`);
-        }
 
         return spanElement;
     }
@@ -86,9 +87,12 @@ export default class GUI
         return `#${num.toString(16).padStart(6, '0')}`;
     }
 
-    static removeLineBreak()
+    static removeLastLineBreak()
     {
-        GUI.container.removeChild(GUI.container.lastChild);
+        if (GUI.container.lastChild.tagName === "BR")
+        {
+            GUI.container.removeChild(GUI.container.lastChild);
+        }
 
         return GUI;
     }
@@ -112,10 +116,28 @@ export default class GUI
 
     static customCSSClasses()
     {
+        // const lospec = [
+        //     "#000000",
+        //     "#626262",
+        //     "#898989",
+        //     "#adadad",
+        //     "#ffffff",
+        //     "#9f4e44",
+        //     "#cb7e75",
+        //     "#6d5412",
+        //     "#a1683c",
+        //     "#c9d487",
+        //     "#9ae29b",
+        //     "#5cab5e",
+        //     "#6abfc6",
+        //     "#887ecb",
+        //     "#50459b",
+        //     "#a057a3"
+        // ]
         let androidsArt16ColorPalette = [
             //0x000000, //  Void
             0x9d9d9d, //  Gray
-            //0xffffff, //  White
+            0xffffff, //  White
             0xbe2633, //  Red
             0xe06f8b, //  Meat
             0x493c2b, //  DarkBrown
@@ -131,17 +153,17 @@ export default class GUI
             0xb2dcef //  CloudBlue
 
         ];
-        // 1. Create a new custom CSSStyleSheet object
+
         const myCustomSheet = new CSSStyleSheet();
       
         let i = 0;
       
         for (const elem of androidsArt16ColorPalette)
         {
-            myCustomSheet.insertRule(`.${GUI.cssPrefix}${i++}{color: #${elem.toString(16).padStart(6, 0)}}`, myCustomSheet.cssRules.length);
+            myCustomSheet.insertRule(`.${GUI.cssPrefix}${i++}{color: ${GUI._numberToHexColor(elem)}}`, myCustomSheet.cssRules.length);
         }
 
-        androidsArt16ColorPalette.push(0xfafafa);
+        // androidsArt16ColorPalette.push(0xfafafa);
       
         for (const elem of androidsArt16ColorPalette)
         {
@@ -153,6 +175,7 @@ export default class GUI
         GUI.cssRulesLength = myCustomSheet.cssRules.length;
       
         //console.log(GUI.cssRulesLength);
+        
         return GUI;
     }
 
@@ -196,7 +219,7 @@ export default class GUI
         for (let i = 0; i < iterArr.length; i++)
         {
             GUI.print(sec.repeat( Math.round(iterArr[i] * ratio) ), colIndices[i])
-            .removeLineBreak();
+            .removeLastLineBreak();
         }
         return GUI.addBR().print(`${' '.repeat(Math.ceil(roll * ratio ))}▲`);
 

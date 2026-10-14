@@ -12,18 +12,33 @@ class Character
      * @param {number} speed - Used to determine turn order (initiative)
      */
     constructor(name, maxHp, accuracy, defense, attackPower, armor, speed) {
-    this.name = name;
-    this.maxHp = maxHp;
-    this.hp = maxHp; 
-    this.accuracy = accuracy;
-    this.defense = defense;
-    this.attackPower = attackPower;
-    this.armor = armor;
-    this.speed = speed;
+        this.name = name;
+        this.maxHp = maxHp;
+        this.hp = maxHp; 
+        this.accuracy = accuracy;
+        this.defense = defense;
+        this.attackPower = attackPower;
+        this.armor = armor;
+        this.speed = speed;
+
+        this.summary();
+    }
+    summary()
+    {
+        GUI.print(this.name, 28)
+        const props = ["maxHp", "accuracy", "defense", "attackPower", "armor", "speed"];
+        let i = 0;
+        for (const prop of props)
+        {
+            const interchange = i++ & 1;
+
+            GUI.print(`${(prop).padEnd(13, " ")}`, interchange? 6:9, `${this[prop]}`, interchange? 6:9);
+        }
     }
 
-    isAlive() {
-    return this.hp > 0;
+    isAlive()
+    {
+        return this.hp > 0;
     }
 
     /**
@@ -31,9 +46,10 @@ class Character
      * Uses base speed plus a dynamic d20 random modifier.
      * @returns {number} Final initiative score
      */
-    rollInitiative() {
-    const diceRoll = Math.floor(Math.random() * 20) + 1;
-    return this.speed + diceRoll;
+    rollInitiative()
+    {
+        const diceRoll = Math.floor(Math.random() * 20) + 1;
+        return this.speed + diceRoll;
     }
 }
 
