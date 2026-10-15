@@ -6,7 +6,7 @@ export default class combatA
 {
     static EFFECTIVE_RANGE = 100;
 
-    static barLength = 28;
+    static barLength = 40;
 
     static ratio = combatA.barLength / combatA.EFFECTIVE_RANGE;
 
@@ -14,6 +14,7 @@ export default class combatA
 
     static clamp(value, min, max)
     {
+        console.log(`Clamp-> min: ${min}, max: ${max}`);
         return Math.max(min, Math.min(max, value));
     }
 
@@ -48,4 +49,19 @@ export default class combatA
 
         return [portion, remaining];
     }
+
+    static sumElements(ary)
+    {
+        const sum = ary.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+
+        const {barLength} = combatA;
+        
+        const ch = barLength === sum;
+
+        console.log(`(barLength = ${barLength}, ${ch? "SAME":` ${sum-this.barLength}`})`);
+
+        return sum;
+        //return ary.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+    }
+
 }

@@ -22,6 +22,9 @@ export default class GUI
     }
 
     static {
+
+        GUI.customCSSClasses();
+        
         if (!GUI.container)
         {
             const c = document.createElement('pre');
@@ -203,37 +206,40 @@ export default class GUI
         return GUI.addBR();
     }
 
-    static drawBar(criticalRange, hitThreshold, parryRange, roll)
-	{
-        const totalLength = 30;
-        const sec = "█";
-        const ratio = totalLength / 100;
-        const colIndices = [5, 8, 0, 10];
-        const iterArr = [
-            criticalRange,
-            hitThreshold - criticalRange,
-            parryRange - hitThreshold,
-            100 - parryRange
-        ];
+    // static drawBar(criticalRange, hitThreshold, parryRange, roll)
+	// {
+    //     const totalLength = 30;
+    //     const sec = "█";
+    //     const ratio = totalLength / 100;
+    //     const colIndices = [5, 8, 0, 10];
+    //     const iterArr = [
+    //         criticalRange,
+    //         hitThreshold - criticalRange,
+    //         parryRange - hitThreshold,
+    //         100 - parryRange
+    //     ];
 
-        for (let i = 0; i < iterArr.length; i++)
-        {
-            GUI.print(sec.repeat( Math.round(iterArr[i] * ratio) ), colIndices[i])
-            .removeLastLineBreak();
-        }
-        return GUI.addBR().print(`${' '.repeat(Math.ceil(roll * ratio ))}▲`);
+    //     for (let i = 0; i < iterArr.length; i++)
+    //     {
+    //         GUI.print(sec.repeat( Math.round(iterArr[i] * ratio) ), colIndices[i])
+    //         .removeLastLineBreak();
+    //     }
+    //     return GUI.addBR().print(`${' '.repeat(Math.ceil(roll * ratio ))}▲`);
 
-	}
+	// }
 
     static destroy()
     {
         GUI.container = undefined;
         //console.log("GUI Destroyed)");
     }
-}
 
-// GUI.customCSSClasses();
-// for (let i = 0; i < GUI.cssRulesLength; i++)
-// {
-//     GUI.print(`[${i.toString().padStart(2, " ")}] --->  `, "Test String", i);
-// }
+    static _testColors()
+    {
+        GUI.customCSSClasses();
+        for (let i = 0; i < GUI.cssRulesLength; i++)
+        {
+            GUI.print(`[${i.toString().padStart(2, " ")}] --->  `, "Test!", i);
+        }
+    }
+}
