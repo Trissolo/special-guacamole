@@ -2,8 +2,7 @@ import GUI from "./newgui.mjs";
 import combatA from "./combatA.mjs";
 import outcomeEnum from "./outcomeEnum.mjs";
 
-// GUI._testColors();
-
+GUI.addBR(2)
 // const baseThreshold = attacker.accuracy - defender.defense;
 
 // const hitThreshold = Math.max(5, Math.min(95, baseThreshold));
@@ -34,7 +33,9 @@ console.log(barLength, harcodedLimits);
 
 const colors = [5, 4, 12, 11];
 
-let prev = 0;
+let previousLength = 0;
+
+let outcome = 0;
 
 let barPortionSizes = [];
 
@@ -44,12 +45,12 @@ for (let i = 0; i < harcodedLimits.length; i++)
 
     console.log(`perc = ${perc}`);
 
-    barPortionSizes.push(perc - prev);
+    barPortionSizes.push(perc - previousLength);
 
-    const grport = GUI.makeSpanWithClass(`${GUI.barUnit.repeat(perc - prev)}`, colors[i]);
+    const grport = GUI.makeSpanWithClass(`${GUI.barUnit.repeat(perc - previousLength)}`, colors[i]);
     GUI.container.appendChild(grport);
 
-    prev = perc;
+    previousLength = perc;
 }
 
 console.log("barPortionSizes:", barPortionSizes);
@@ -57,8 +58,10 @@ console.log("barPortionSizes:", barPortionSizes);
 const sum = combatA.sumElements(barPortionSizes);
 
 // test arrow
-const roll = 68;
-prev = 0;
+
+const roll = 11;
+
+previousLength = 0;
 
 for(const [i, limit] of harcodedLimits.entries())
 {
@@ -68,13 +71,17 @@ for(const [i, limit] of harcodedLimits.entries())
         
         const adapetdRoll = (  (  (roll / 100) * barLength  ) | 0  );
         
-        const clamped = combatA.clamp(adapetdRoll, prev, prev + barPortionSizes[i] - 1);
+        const clamped = combatA.clamp(adapetdRoll, previousLength, previousLength + barPortionSizes[i] - 1);
         
         console.log(`${outcomeEnum[i]} - clmaped cursor: ${clamped}`);
 
-        GUI.addBR().print(`${' '.repeat(clamped)}|`);
+        outcome = i;
+
+        GUI.addBR().print(`${' '.repeat(clamped)}▲`);
         break;
     }
 
-    prev += barPortionSizes[i];
+    previousLength += barPortionSizes[i];
 }
+
+GUI.print(`Outcome: `, `${outcomeEnum[outcome]}`, colors[outcome]);
