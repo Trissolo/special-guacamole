@@ -63,6 +63,9 @@ const roll = 11;
 
 previousLength = 0;
 
+// harcodedLimits.reduce((ac, cv, i, arr) => {arr[i]-=ac;return cv}, 0);
+// harcodedLimits.reduce((ac, cv, i, arr) => (arr[i]-=ac, cv), 0);
+
 for(const [i, limit] of harcodedLimits.entries())
 {
     // console.log("limit", limit, i);
@@ -85,3 +88,65 @@ for(const [i, limit] of harcodedLimits.entries())
 }
 
 GUI.print(`Outcome: `, `${outcomeEnum[outcome]}`, colors[outcome]);
+
+GUI.addResultBar(harcodedLimits, roll, 434);
+
+GUI.print(`Outcome: `, `${outcomeEnum[outcome]}`, colors[outcome]);
+
+
+/*
+// <body>
+// <script>
+const svgNS = "http://www.w3.org/2000/svg";
+
+const svg = document.createElementNS(svgNS, "svg");
+
+svg.setAttribute("width", "300");
+
+svg.setAttribute("height", "40");
+
+document.body.appendChild(svg);
+
+
+function relRect(x, y, w, h, col, parent = svg)
+{
+    const rect = document.createElementNS(svgNS, "rect");
+    rect.setAttribute("x", `${x}%`);
+    rect.setAttribute("y", `${y}%`);
+    rect.setAttribute("width", `${w}%`);
+    rect.setAttribute("height", `${h}%`);
+    rect.setAttribute("fill", col);
+    parent.appendChild(rect);
+    return rect;
+}
+
+//bg
+relRect(0, 0, 100, 100, '#e0e0e0');
+
+
+// the bar
+const harcodedLimits = [5, 50, 95, 100];
+
+const posi = [0, ...harcodedLimits];
+posi.pop(); 
+
+harcodedLimits.reduce((ac, cv, i, arr) => (arr[i]-=ac, cv), 0);
+
+console.log("harcodedLimits", harcodedLimits);
+console.log("posi", posi);
+
+
+const cols = ['orange', 'aqua', 'red', 'gray'];
+
+
+for (const [x, fill, width] of Iterator.zip([posi, cols, harcodedLimits]))
+{
+    relRect(x, 25, width, 50, fill);
+}
+
+const marker = relRect(50, 0, 1, 100, '#111111');
+marker.setAttribute("fill-opacity", 0.5);
+
+// </script>
+// </body>
+*/

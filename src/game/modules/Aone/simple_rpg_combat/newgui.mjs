@@ -8,6 +8,8 @@ export default class GUI
 
     static barUnit = "█";
 
+    static svgNS = "http://www.w3.org/2000/svg";
+
     static emoji = {
         bug: `🐛`,
         debugInfo: '💬',
@@ -242,4 +244,128 @@ export default class GUI
             GUI.print(`[${i.toString().padStart(2, " ")}] --->  `, "Test!", i);
         }
     }
+
+    static makeSVG(width = 300, height = 40)
+    {
+        //const svgNS = "http://www.w3.org/2000/svg";
+
+        const svg = document.createElementNS(GUI.svgNS, "svg");
+
+        svg.setAttribute("width", `${width}`);
+
+        svg.setAttribute("height", `${height}`);
+
+        GUI.container.appendChild(svg);
+        
+        return svg;
+    }
+
+
+    static makeRect(x, y, w, h, col, parent)
+    {
+        const rect = document.createElementNS(GUI.svgNS, "rect");
+
+        rect.setAttribute("x", `${x}%`);
+
+        rect.setAttribute("y", `${y}%`);
+
+        rect.setAttribute("width", `${w}%`);
+
+        rect.setAttribute("height", `${h}%`);
+
+        rect.setAttribute("fill", col);
+
+        if (parent)
+        {
+            parent.appendChild(rect);
+        }            
+
+        return rect;
+    }
+
+    static addResultBar(limitsArray, roll, width = 300, height = 40)
+    {
+        const svg = GUI.makeSVG(width, height);
+
+        const clonedLimits = [...limitsArray];
+        
+        const positions = [0, ...clonedLimits];
+        positions.pop();
+
+        clonedLimits.reduce((ac, cv, i, arr) => (arr[i] -= ac, cv), 0);
+
+        const colors = ['orange', 'aqua', 'red', 'gray'];
+
+        for (const [x, fill, width] of Iterator.zip([positions, colors, clonedLimits]))
+        {
+            GUI.makeRect(x, 25, width, 50, fill, svg);
+        }
+
+        if (roll)
+        {
+            /*const rollMarker = */ GUI.makeRect(Math.max(roll - 0.5, 0.001), 0, 1, 100, '#67910585', svg);
+
+            //rollMarker.setAttribute("fill-opacity", 0.2);
+        }
+
+        return GUI.addBR();
+    }
+
+    
 }
+
+
+// test SVGbar
+// const svg = GUI.makeSVG();
+
+//  // the bar
+// const harcodedLimits = [5, 50, 95, 100];
+
+// const posi = [0, ...harcodedLimits];
+// posi.pop(); 
+
+// harcodedLimits.reduce((ac, cv, i, arr) => (arr[i]-=ac, cv), 0);
+
+// // console.log("harcodedLimits", harcodedLimits);
+// // console.log("posi", posi);
+
+
+// const cols = ['orange', 'aqua', 'red', 'gray'];
+
+
+// for (const [x, fill, width] of Iterator.zip([posi, cols, harcodedLimits]))
+// {
+//     GUI.relRect(x, 25, width, 50, fill, svg);
+// }
+
+// const marker = GUI.relRect(50, 0, 1, 100, '#1fffff', svg);
+// marker.setAttribute("fill-opacity", 0.5);
+
+// //bg
+// relRect(0, 0, 100, 100, '#e0e0e0');
+
+
+// // the bar
+// const harcodedLimits = [5, 50, 95, 100];
+
+// const posi = [0, ...harcodedLimits];
+// posi.pop(); 
+
+// harcodedLimits.reduce((ac, cv, i, arr) => (arr[i]-=ac, cv), 0);
+
+// console.log("harcodedLimits", harcodedLimits);
+// console.log("posi", posi);
+
+
+// const cols = ['orange', 'aqua', 'red', 'gray'];
+
+
+// for (const [x, fill, width] of Iterator.zip([posi, cols, harcodedLimits]))
+// {
+//     relRect(x, 25, width, 50, fill);
+// }
+
+// const marker = relRect(50, 0, 1, 100, '#111111');
+// marker.setAttribute("fill-opacity", 0.5);
+//     }
+
