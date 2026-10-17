@@ -24,29 +24,37 @@ export default class GUI
     }
 
     static {
+        // create the body if needed:
+        if (!document.body)
+        {
+            document.body = document.createElement("body");
+        }
 
+        // prepare CSS classes
         GUI.customCSSClasses();
         
+        // generate the <pre> container, that will become the default NodeElement for text output
         if (!GUI.container)
         {
             const c = document.createElement('pre');
             
-            c.style.setProperty('color', '#fafafa');
-            
-            c.style.setProperty('background-color', '#000000');
+            const defaultCss = [
+                ['color', '#fafafa'],
+                ['background-color', '#000000'],
+                ['font-size', 'x-large'],
+                ['height', '40em']
+            ];
 
-            c.style.setProperty('font-size', 'x-large');
-
-            c.style.setProperty('height', '40em');
+            for (const [prop, val] of defaultCss)
+            {
+                c.style.setProperty(prop, val);
+            }
     
-            document.body = document.createElement("body");
-
             document.body.appendChild(c);
             
             GUI.container = c;
         }
 
-        //console.log(GUI.container = c, document);
     }
 
     static makeTextNode(text) //line(text, lineBreak = true)
@@ -172,7 +180,8 @@ export default class GUI
       
         for (const elem of androidsArt16ColorPalette)
         {
-            myCustomSheet.insertRule(`.${GUI.cssPrefix}${i++}{background-color: ${GUI._numberToHexColor(elem)}; padding: 0 1em; color: #000000}`, myCustomSheet.cssRules.length);
+            // myCustomSheet.insertRule(`.${GUI.cssPrefix}${i++}{background-color: ${GUI._numberToHexColor(elem)}; padding: 0 1em; color: #000000}`, myCustomSheet.cssRules.length);
+            myCustomSheet.insertRule(`.${GUI.cssPrefix}${i++}{background-color: ${GUI._numberToHexColor(elem)}; color: #000000}`, myCustomSheet.cssRules.length);
         }
       
         document.adoptedStyleSheets.push(myCustomSheet);
@@ -274,6 +283,8 @@ export default class GUI
         rect.setAttribute("height", `${h}%`);
 
         rect.setAttribute("fill", col);
+        
+        
 
         if (parent)
         {
@@ -292,9 +303,9 @@ export default class GUI
         const positions = [0, ...clonedLimits];
         positions.pop();
 
-        clonedLimits.reduce((ac, cv, i, arr) => (arr[i] -= ac, cv), 0);
+        clonedLimits.reduce((ac, cv, i, arr) => (arr[i] -= ac, cv));
 
-        const colors = ['orange', 'aqua', 'red', 'gray'];
+        const colors = ['#a46422', '#493c2b', '#005784', '#1b2632']; //[5, 4, 12, 11]; //['orange', 'aqua', 'red', 'gray']; // [5, 8, 0, 10];
 
         for (const [x, fill, width] of Iterator.zip([positions, colors, clonedLimits]))
         {
@@ -313,59 +324,4 @@ export default class GUI
 
     
 }
-
-
-// test SVGbar
-// const svg = GUI.makeSVG();
-
-//  // the bar
-// const harcodedLimits = [5, 50, 95, 100];
-
-// const posi = [0, ...harcodedLimits];
-// posi.pop(); 
-
-// harcodedLimits.reduce((ac, cv, i, arr) => (arr[i]-=ac, cv), 0);
-
-// // console.log("harcodedLimits", harcodedLimits);
-// // console.log("posi", posi);
-
-
-// const cols = ['orange', 'aqua', 'red', 'gray'];
-
-
-// for (const [x, fill, width] of Iterator.zip([posi, cols, harcodedLimits]))
-// {
-//     GUI.relRect(x, 25, width, 50, fill, svg);
-// }
-
-// const marker = GUI.relRect(50, 0, 1, 100, '#1fffff', svg);
-// marker.setAttribute("fill-opacity", 0.5);
-
-// //bg
-// relRect(0, 0, 100, 100, '#e0e0e0');
-
-
-// // the bar
-// const harcodedLimits = [5, 50, 95, 100];
-
-// const posi = [0, ...harcodedLimits];
-// posi.pop(); 
-
-// harcodedLimits.reduce((ac, cv, i, arr) => (arr[i]-=ac, cv), 0);
-
-// console.log("harcodedLimits", harcodedLimits);
-// console.log("posi", posi);
-
-
-// const cols = ['orange', 'aqua', 'red', 'gray'];
-
-
-// for (const [x, fill, width] of Iterator.zip([posi, cols, harcodedLimits]))
-// {
-//     relRect(x, 25, width, 50, fill);
-// }
-
-// const marker = relRect(50, 0, 1, 100, '#111111');
-// marker.setAttribute("fill-opacity", 0.5);
-//     }
 
