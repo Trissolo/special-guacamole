@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<style>
+p {
+font-size: x-large;
+text-align: justify;
+}
+</style>
+<body>
+
+<h1>JavaScript Strings</h1>
+<div>
+<button id="tag-bold" type="button">Add to favorites</button>
+</div>
+<label for="myTextarea">Tell us your story:</label>
+
+<textarea id="myTextarea" name="story" rows="5" cols="33">
+It was a dark and stormy night...
+</textarea>
+
+<script>
+function insertMarkdown(tagOpen, tagClose = "") {
+    const textarea = document.getElementById("myTextarea");
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    
+    // Extract what the user currently has highlighted
+    const selectedText = text.substring(start, end);
+    
+    // Construct the new text block
+    const replacement = `${tagOpen}${selectedText}${tagClose}`;
+    
+    // Update the textarea contents
+    textarea.value = `${text.substring(0, start)}${replacement}${text.substring(end)}`;
+    
+    // Bring focus back and position the cursor cleanly
+    textarea.focus();
+    textarea.selectionStart = start + tagOpen.length;
+    textarea.selectionEnd = start + tagOpen.length + selectedText.length;
+}
+
+// Example Trigger Usage:
+// Bold button click -> insertMarkdown('**', '**')
+// Heading button click -> insertMarkdown('# ', '')
+const boldButton = document.getElementById('tag-bold');
+boldButton.dataset.tagStart = "**";
+boldButton.dataset.tagEnd = "**";
+
+console.log(boldButton);
+//boldButton.addEventListener('click', e => console.log("ee", e, e.target === boldButton, e.target.dataset.tagStart));
+boldButton.addEventListener('click', e => {
+const {tagStart, tagEnd} = e.target.dataset;
+console.log(`St: ${tagStart}, tagEnd: ${tagEnd}`)
+insertMarkdown(tagStart, tagEnd);
+
+});
+</script>
+
+</body>
+</html>
