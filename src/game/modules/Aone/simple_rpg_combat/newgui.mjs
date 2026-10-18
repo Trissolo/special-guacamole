@@ -294,20 +294,26 @@ export default class GUI
         return rect;
     }
 
-    static addResultBar(limitsArray, roll, width = 300, height = 40)
+    static addSVGResultBar(limitsArray, roll, width = 300, height = 40)
     {
         const svg = GUI.makeSVG(width, height);
 
-        const clonedLimits = [...limitsArray];
-        
-        const positions = [0, ...clonedLimits];
-        positions.pop();
+        const positions = [0 , ...limitsArray.slice(0, 3)];
 
-        clonedLimits.reduce((ac, cv, i, arr) => (arr[i] -= ac, cv));
+        const relativeWidth = limitsArray.map((val, i) => i === 0 ? val : val - limitsArray[i - 1]);
+
+        // const positions = [...limitsArray];
+        // positions.reduce((accum, currVal, idx, arr) => (arr[idx] = accum, currVal), 0);
+
+        // const positions = [...limitsArray].copyWithin(1, 0, 3);
+        // positions[0] = 0; 
+
+        // const clonedLimits = [...limitsArray];
+        // clonedLimits.reduce((ac, cv, i, arr) => (arr[i] -= ac, cv));
 
         const colors = ['#a46422', '#493c2b', '#005784', '#1b2632']; //[5, 4, 12, 11]; //['orange', 'aqua', 'red', 'gray']; // [5, 8, 0, 10];
 
-        for (const [x, fill, width] of Iterator.zip([positions, colors, clonedLimits]))
+        for (const [x, fill, width] of Iterator.zip([positions, colors, relativeWidth]))
         {
             GUI.makeRect(x, 25, width, 50, fill, svg);
         }

@@ -20,84 +20,84 @@ GUI.addBR(2)
 
 // ne
 
-const harcodedLimits = [
-    5,  // limit for: 'Critical Hit'
-    35,  // limit for: 'Hit - Standard Wound'
-    90,  // limit for: 'Parried'
-    100  // 100 or MORE, 'Miss'  
-];  //new Uint8Array(4);
+// const harcodedLimits = [
+//     5,  // limit for: 'Critical Hit'
+//     35,  // limit for: 'Hit - Standard Wound'
+//     90,  // limit for: 'Parried'
+//     100  // 100 or MORE, 'Miss'  
+// ];  //new Uint8Array(4);
+const harcodedLimits = [14, 60, 88, 100];
 
-const {barLength} = combatA;
+// const {barLength} = combatA;
 
-console.log(barLength, harcodedLimits);
+// console.log(barLength, harcodedLimits);
 
-const colors = [5, 4, 12, 11];
+ const colors = [5, 4, 12, 11];
 
-let previousLength = 0;
+// let previousLength = 0;
 
 let outcome = 0;
 
-let barPortionSizes = [];
+// let barPortionSizes = [];
 
-for (let i = 0; i < harcodedLimits.length; i++)
-{
-    const perc = Math.floor(((harcodedLimits[i]) / 100) * barLength);
+// for (let i = 0; i < harcodedLimits.length; i++)
+// {
+//     const perc = Math.floor(((harcodedLimits[i]) / 100) * barLength);
 
-    console.log(`perc = ${perc}`);
+//     console.log(`perc = ${perc}`);
 
-    barPortionSizes.push(perc - previousLength);
+//     barPortionSizes.push(perc - previousLength);
 
-    const grport = GUI.makeSpanWithClass(`${GUI.barUnit.repeat(perc - previousLength)}`, colors[i]);
+//     const grport = GUI.makeSpanWithClass(`${GUI.barUnit.repeat(perc - previousLength)}`, colors[i]);
 
-    GUI.container.appendChild(grport);
+//     GUI.container.appendChild(grport);
 
-    previousLength = perc;
-}
+//     previousLength = perc;
+// }
 
-console.log("barPortionSizes:", barPortionSizes);
+// console.log("barPortionSizes:", barPortionSizes);
 
-const sum = combatA.sumElements(barPortionSizes);
+// const sum = combatA.sumElements(barPortionSizes);
 
-// test arrow
+// // test arrow
 
-const roll = 36;
+// const roll = 36;
 
-previousLength = 0;
+// previousLength = 0;
 
-// harcodedLimits.reduce((ac, cv, i, arr) => {arr[i]-=ac;return cv}, 0);
-// harcodedLimits.reduce((ac, cv, i, arr) => (arr[i]-=ac, cv), 0);
+// // harcodedLimits.reduce((ac, cv, i, arr) => {arr[i]-=ac;return cv}, 0);
+// // harcodedLimits.reduce((ac, cv, i, arr) => (arr[i]-=ac, cv), 0);
 
-for(const [i, limit] of harcodedLimits.entries())
-{
-    // console.log("limit", limit, i);
-    if (roll <= limit)
-    {
+// for(const [i, limit] of harcodedLimits.entries())
+// {
+//     // console.log("limit", limit, i);
+//     if (roll <= limit)
+//     {
         
-        const adapetdRoll = (  (  (roll / 100) * barLength  ) | 0  );
+//         const adapetdRoll = (  (  (roll / 100) * barLength  ) | 0  );
         
-        const clamped = combatA.clamp(adapetdRoll, previousLength, previousLength + barPortionSizes[i] - 1);
+//         const clamped = combatA.clamp(adapetdRoll, previousLength, previousLength + barPortionSizes[i] - 1);
         
-        console.log(`${outcomeEnum[i]} - clmaped cursor: ${clamped}`);
+//         console.log(`${outcomeEnum[i]} - clmaped cursor: ${clamped}`);
 
-        outcome = i;
+//         outcome = i;
 
-        GUI.addBR().print(`${' '.repeat(clamped)}▲`);
-        break;
-    }
+//         GUI.addBR().print(`${' '.repeat(clamped)}▲`);
+//         break;
+//     }
 
-    previousLength += barPortionSizes[i];
-}
+//     previousLength += barPortionSizes[i];
+// }
 
-GUI.print(`Outcome: (${roll}) `, `${outcomeEnum[outcome]}`, colors[outcome]);
+// GUI.print(`Outcome: (${roll}) `, `${outcomeEnum[outcome]}`, colors[outcome]);
 
-GUI.addBR(3).print(`  Test SVG  `, 15);
-GUI.print(`Test SVG`, 5);
+GUI.addBR(3).print(" ".repeat(6), `${" ".repeat(8)}Test SVG${" ".repeat(8)}`, 15).addBR();
 
 for (let i = 5; i--;)
 {
     const roll = combatA.dieRoll();
 
-    GUI.addResultBar(harcodedLimits, roll, 434);
+    GUI.addSVGResultBar(harcodedLimits, roll, 434);
 
     for(const [i, limit] of harcodedLimits.entries())
     {
