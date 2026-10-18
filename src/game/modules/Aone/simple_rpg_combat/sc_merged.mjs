@@ -1,6 +1,8 @@
 import GUI from "./newgui.mjs";
 import combatA from "./combatA.mjs";
-import outcomeEnum from "./outcomeEnum.mjs";
+// import outcomeEnum from "./outcomeEnum.mjs";
+import outcomeStatus from "./constants/outcomeStatus.mjs";
+import outcomeStrings from "./constants/outcomeStrings.mjs";
 
 GUI.addBR(2)
 // const baseThreshold = attacker.accuracy - defender.defense;
@@ -37,6 +39,8 @@ const harcodedLimits = [14, 60, 88, 100];
 // let previousLength = 0;
 
 let outcome = 0;
+
+let range = null;
 
 // let barPortionSizes = [];
 
@@ -95,21 +99,25 @@ GUI.addBR(3).print(" ".repeat(6), `${" ".repeat(8)}Test SVG${" ".repeat(8)}`, 15
 
 for (let i = 5; i--;)
 {
-    const roll = combatA.dieRoll();
+    const roll = Math.random() > 0.5? 14:15 // combatA.dieRoll();
 
-    GUI.addSVGResultBar(harcodedLimits, roll, 434);
+    GUI.addSVGResultBar(harcodedLimits, roll, 300);
 
     for(const [i, limit] of harcodedLimits.entries())
     {
         if (roll <= limit)
         {         
             outcome = i;
+            console.log("limit", limit, i, harcodedLimits);
+            range = `range: ${i=== 0? `0`: `${harcodedLimits[i-1] }`} - ${harcodedLimits[i]}`;
+
             break;
         }
 
         
     }
 
-    GUI.print(`Outcome: (${roll}) `, `${outcomeEnum[outcome]}`, colors[outcome]).addBR(2);
+   // GUI.print(`Outcome: (${roll} - ${range}) `, `${outcomeStrings[outcome]}`, colors[outcome]).addBR(2);
+    GUI.print(`${outcomeStrings[outcome]}: `, colors[outcome], `range: ${outcome===0? "0": `${harcodedLimits[outcome - 1] + 1}`}-`, ` ${roll} `, 18, `-${harcodedLimits[outcome]}.`).addBR(2);
 }
 

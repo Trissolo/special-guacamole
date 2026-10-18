@@ -1,4 +1,3 @@
-import outcomeEnum from "./outcomeEnum.mjs";
 
 import GUI from "./newgui.mjs";
 
