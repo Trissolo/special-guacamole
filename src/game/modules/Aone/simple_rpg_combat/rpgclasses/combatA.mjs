@@ -1,5 +1,5 @@
 
-import GUI from "./newgui.mjs";
+import GUI from "./gui/newgui.mjs";
 
 export default class combatA
 {

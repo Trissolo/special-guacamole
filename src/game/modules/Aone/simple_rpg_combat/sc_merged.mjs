@@ -1,7 +1,10 @@
-import GUI from "./rpgclasses/newgui.mjs";
+import GUI from "./rpgclasses/gui/newgui.mjs";
 import combatA from "./rpgclasses/combatA.mjs";
 import outcomeStatus from "./constants/outcomeStatus.mjs";
 import outcomeStrings from "./constants/outcomeStrings.mjs";
+
+GUI.init();
+// GUI._testColors();
 
 // GUI.addBR(2)
 // const baseThreshold = attacker.accuracy - defender.defense;
@@ -33,7 +36,7 @@ const harcodedLimits = [14, 60, 88, 100];
 
 // console.log(barLength, harcodedLimits);
 
- const colors = [5, 4, 12, 11];
+ const colors = GUI.svgBarColorIndices; //[5, 4, 12, 11];
 
 // let previousLength = 0;
 

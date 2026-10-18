@@ -1,0 +1,20 @@
+const paletteLospec = [
+    // 0x000000,
+    0x626262,
+    0x898989,
+    0xadadad,
+    0xffffff,
+    0x9f4e44,
+    0xcb7e75,
+    0x6d5412,
+    0xa1683c,
+    0xc9d487,
+    0x9ae29b,
+    0x5cab5e,
+    0x6abfc6,
+    0x887ecb,
+    0x50459b,
+    0xa057a3
+];
+
+export default paletteLospec;
