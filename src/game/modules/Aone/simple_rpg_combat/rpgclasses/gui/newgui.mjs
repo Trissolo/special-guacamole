@@ -66,7 +66,13 @@ const GUI = {
             document.body = document.createElement("body");
         }
 
+        const maiDiv = document.createElement('div');
+        maiDiv.style.setProperty('height', '90vh');
+       
+        
         document.body.style.setProperty('background-color', '#070404');
+        document.body.style.setProperty('height', '100%');
+        document.body.appendChild(maiDiv);
         
         // generate the <pre> container, that will become the default NodeElement for text output
         if (!this.container)
@@ -78,7 +84,7 @@ const GUI = {
                 ['color', '#fafafa'],
                 ['background-color', '#000000'],
                 ['font-size', 'x-large'],
-                ['height', '40em']
+                // ['height', '80vh']
             ];
 
             for (const [prop, val] of defaultCss)
@@ -86,7 +92,12 @@ const GUI = {
                 c.style.setProperty(prop, val);
             }
             
-            document.body.appendChild(c);
+            // document.body.appendChild(c);
+            // maiDiv.append(GUI.container, GUI.makeButton());
+            maiDiv.appendChild(c);
+
+            // maiDiv.appendChild(GUI.makeButton());
+
 
             this.container = c;
 
@@ -119,9 +130,11 @@ const GUI = {
         return spanElement;
     },
 
-    makeButton()
+    makeButton(text = 'Click Me!')
     {
         const btn = document.createElement('button');
+
+        btn.appendChild(GUI.makeTextNode(text));
 
         return btn;
     },
