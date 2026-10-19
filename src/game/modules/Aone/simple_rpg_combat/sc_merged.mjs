@@ -103,14 +103,16 @@ for (let i = 5; i--;)
 {
     const roll = combatA.dieRoll(); // Math.random() > 0.5? 14:15
 
-    GUI.addSVGResultBar(harcodedLimits, roll, 300);
+    GUI.addSVGResultBar(harcodedLimits, roll, 120);
 
     for(const [i, limit] of harcodedLimits.entries())
     {
         if (roll <= limit)
         {         
             outcome = i;
-            console.log("limit", limit, i, harcodedLimits);
+
+            // console.log("limit", limit, i, harcodedLimits);
+
             range = `range: ${i=== 0? `0`: `${harcodedLimits[i-1] }`} - ${harcodedLimits[i]}`;
 
             break;
@@ -118,6 +120,6 @@ for (let i = 5; i--;)
     }
 
    // GUI.print(`Outcome: (${roll} - ${range}) `, `${outcomeStrings[outcome]}`, colors[outcome]).addBR(2);
-    GUI.print(` ${outcomeStrings[outcome]}: `, colors[outcome], `range: ${outcome===0? "0": `${harcodedLimits[outcome - 1] + 1}`}-`, ` ${roll} `, 18, `-${harcodedLimits[outcome]}.`).addBR(2);
+    GUI.print(` ${outcomeStrings[outcome]}: `, colors[outcome], `range: ${outcome===0? "0": `${harcodedLimits[outcome - 1] + 1}`}-`, ` ${roll} `, GUI.svgBarColorIndices[outcome]+ GUI.currPalette.length, `-${harcodedLimits[outcome]}.`).addBR(2);
 }
 

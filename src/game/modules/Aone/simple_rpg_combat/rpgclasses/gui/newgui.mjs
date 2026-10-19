@@ -4,38 +4,49 @@ import paletteLospec from "./paletteLospec.mjs";
 
 const GUI = {
 
+    _cssPrefix: "css",
+
+    _cssRulesLength: 0,
+
+    _svgNS: "http://www.w3.org/2000/svg",
+    
+    _svgRectQualifiedName: ["x", "y", "width", "height"],
+    
+    // _barUnit: "█",
+
     paletteIdx: 0,
 
     palettes: [paletteAndroidArts, paletteLospec],
-
-    svgBarColorIndices: new Uint8Array([9, 10, 4, 0]), // [5, 4, 12, 11]),
-
-    barCSSColors: [],
 
     get currPalette()
     {
         return this.palettes[this.paletteIdx];
     },
 
+    svgBarColorIndices: new Uint8Array([9, 10, 4, 0]), // [5, 4, 12, 11]),
+
+    svgBarColors: [],
+
     container: document.getElementById('container'),
-
-    cssPrefix: "css",
-
-    cssRulesLength: 0,
-
-    // barUnit: "█",
-
-    svgNS: "http://www.w3.org/2000/svg",
 
     emoji: gui_emoji,
 
+    // uiController: new AbortController(),
+    // const { signal } = this.uiController;
+    // .addEventListener('resize', handleResize, { signal });
+
+    _numberToHexColor(num)
+    {
+        return `#${num.toString(16).padStart(6, '0')}`;
+    },
+
     _assemblePaletteColors()
     {
-        this.barCSSColors.length = 0;
+        this.svgBarColors.length = 0;
 
         for (const colIdx of this.svgBarColorIndices)
         {
-            this.barCSSColors.push(this._numberToHexColor(this.currPalette[colIdx]));
+            this.svgBarColors.push(this._numberToHexColor(this.currPalette[colIdx]));
         }
     },
 
@@ -84,7 +95,7 @@ const GUI = {
 
     },
 
-    makeTextNode(text) //line(text, lineBreak = true)
+    makeTextNode(text)
     {
         return document.createTextNode(text);
     },
@@ -100,17 +111,19 @@ const GUI = {
 
         spanElement.appendChild(this.makeTextNode(text));
 
-        if (cssClass < this.cssRulesLength)
+        if (cssClass < this._cssRulesLength)
         {
-            spanElement.classList.add(`${this.cssPrefix}${cssClass}`);
+            spanElement.classList.add(`${this._cssPrefix}${cssClass}`);
         }
 
         return spanElement;
     },
 
-    _numberToHexColor(num)
+    makeButton()
     {
-        return `#${num.toString(16).padStart(6, '0')}`;
+        const btn = document.createElement('button');
+
+        return btn;
     },
 
     removeLastLineBreak()
@@ -148,21 +161,20 @@ const GUI = {
       
         for (const elem of this.currPalette)
         {
-            // console.log(elem, `.${this.cssPrefix}${i++}{color: ${this._numberToHexColor(elem)}}` )
-            myCustomSheet.insertRule(`.${this.cssPrefix}${i++}{color: ${this._numberToHexColor(elem)}}`, myCustomSheet.cssRules.length);
+            myCustomSheet.insertRule(`.${this._cssPrefix}${i++}{color: ${this._numberToHexColor(elem)}}`, myCustomSheet.cssRules.length);
         }
 
         for (const elem of this.currPalette)
         {
-            // myCustomSheet.insertRule(`.${this.cssPrefix}${i++}{background-color: ${this._numberToHexColor(elem)}; padding: 0 1em; color: #000000}`, myCustomSheet.cssRules.length);
-            myCustomSheet.insertRule(`.${this.cssPrefix}${i++}{background-color: ${this._numberToHexColor(elem)}; color: #000000}`, myCustomSheet.cssRules.length);
+            // myCustomSheet.insertRule(`.${this._cssPrefix}${i++}{background-color: ${this._numberToHexColor(elem)}; padding: 0 1em; color: #000000}`, myCustomSheet.cssRules.length);
+            myCustomSheet.insertRule(`.${this._cssPrefix}${i++}{background-color: ${this._numberToHexColor(elem)}; color: #000000}`, myCustomSheet.cssRules.length);
         }
       
         document.adoptedStyleSheets.push(myCustomSheet);
 
-        this.cssRulesLength = myCustomSheet.cssRules.length;
+        this._cssRulesLength = myCustomSheet.cssRules.length;
       
-        //console.log(this.cssRulesLength);
+        //console.log(this._cssRulesLength);
         
         return this;
     },
@@ -181,7 +193,7 @@ const GUI = {
             {
                 this.container.appendChild(this.makeSpanWithClass(current, next));
 
-                i += 1; // Skip the color index on the next iteration
+                i+= 1; // Skip the color index on the next iteration
             }
             else
             {
@@ -216,14 +228,15 @@ const GUI = {
 
     destroy()
     {
+        // this.uiController.abort();
+
         this.container = undefined;
-        //console.log("GUI Destroyed)");
     },
 
     _testColors()
     {
         this.customCSSClasses();
-        for (let i = 0; i < this.cssRulesLength; i++)
+        for (let i = 0; i < this._cssRulesLength; i++)
         {
             this.print(`[${i.toString().padStart(2, " ")}] --->  `, "Test!", i);
         }
@@ -231,9 +244,9 @@ const GUI = {
 
     makeSVG(width = 300, height = 40)
     {
-        //const svgNS = "http://www.w3.org/2000/svg";
+        //const _svgNS = "http://www.w3.org/2000/svg";
 
-        const svg = document.createElementNS(this.svgNS, "svg");
+        const svg = document.createElementNS(this._svgNS, "svg");
 
         svg.setAttribute("width", `${width}`);
 
@@ -247,15 +260,12 @@ const GUI = {
 
     makeRect(x, y, w, h, cssCol, parent)
     {
-        const rect = document.createElementNS(this.svgNS, "rect");
+        const rect = document.createElementNS(this._svgNS, "rect");
 
-        rect.setAttribute("x", `${x}%`);
-
-        rect.setAttribute("y", `${y}%`);
-
-        rect.setAttribute("width", `${w}%`);
-
-        rect.setAttribute("height", `${h}%`);
+        for (const [prop, value] of Iterator.zip([this._svgRectQualifiedName, [x, y, w, h]]))
+        {
+            rect.setAttribute(prop, `${value}%`);
+        }
 
         rect.setAttribute("fill", cssCol);
         
@@ -286,7 +296,7 @@ const GUI = {
 
         //const colors = ['#a46422', '#493c2b', '#005784', '#1b2632']; //[5, 4, 12, 11]; //['orange', 'aqua', 'red', 'gray']; // [5, 8, 0, 10];
 
-        for (const [x, fill, width] of Iterator.zip([positions, this.barCSSColors, relativeWidth]))
+        for (const [x, width, fill] of Iterator.zip([positions, relativeWidth, this.svgBarColors]))
         {
             this.makeRect(x, 25, width, 50, fill, svg);
         }
@@ -303,4 +313,4 @@ const GUI = {
    
 }
 
-export default GUI
+export default GUI;
