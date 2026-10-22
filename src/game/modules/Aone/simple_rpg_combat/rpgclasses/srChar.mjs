@@ -11,7 +11,8 @@ class Character
      * @param {number} armor - Flat damage reduction for normal hits
      * @param {number} speed - Used to determine turn order (initiative)
      */
-    constructor(name, maxHp, accuracy, defense, attackPower, armor, speed) {
+    constructor(name, maxHp, accuracy, defense, attackPower, armor, speed)
+    {
         this.name = name;
         this.maxHp = maxHp;
         this.hp = maxHp; 
@@ -25,7 +26,8 @@ class Character
     }
     summary()
     {
-        GUI.print(this.name, 28)
+        GUI.print(this.name, 28);
+        
         const props = ["maxHp", "accuracy", "defense", "attackPower", "armor", "speed"];
         let i = 0;
         for (const prop of props)

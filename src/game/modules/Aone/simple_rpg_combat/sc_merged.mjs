@@ -104,7 +104,7 @@ for (let i = 5; i--;)
 {
     const roll = combatA.dieRoll(); // Math.random() > 0.5? 14:15
 
-    GUI.addSVGResultBar(harcodedLimits, roll, 120);
+    GUI.addSVGResultBar(harcodedLimits, roll, 220);
 
     for(const [i, limit] of harcodedLimits.entries())
     {
