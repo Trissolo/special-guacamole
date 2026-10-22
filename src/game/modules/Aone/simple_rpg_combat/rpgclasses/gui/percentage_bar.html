@@ -1,0 +1,99 @@
+<div id="chart-target"></div>
+
+<script>
+    // Input values do not even need to equal exactly 100; it auto-normalizes!
+    const myData = [20, 50, 90]
+    
+    // Generate the SVG code string
+    //const svgCode = generateStackedBarSVG(myData);
+    
+    // Inject it into your layout DOM element
+    //document.getElementById('chart-target').innerHTML = svgCode;
+
+
+/**
+ * Generates a 100% stacked bar chart SVG string from an array of proportions.
+ * @param {number[]} data - Array of integers representing the relative widths (e.g., [70, 25, 5])
+ * @returns {string} Fully formed inline SVG string
+ */
+/**
+ * Generates a 100% stacked bar chart SVG string from an array of X-coordinate boundaries.
+ * @param {number[]} xCoordinates - Array of integers representing the X boundary markers (e.g., [0, 60, 90, 100])
+ * @returns {string} Fully formed inline SVG string
+ */
+function generateStackedBarByCoords(xCoordinates) {
+    xCoordinates = [0, ...xCoordinates, 100];
+    // Edge case safety checks
+    if (!xCoordinates || xCoordinates.length < 2) return '';
+
+    // 1. Chart Configuration Dimensions
+    const totalBarWidth = 500;
+    const barHeight = 40;
+    const svgWidth = 520; // Extra padding for aesthetics
+    const svgHeight = 60;
+    const startY = 10;
+    const borderRadius = 4;
+
+    // 2. Color Palette for Segments
+    const colors = ['#34a853', '#4285f4', '#ea4335', '#fbbc05', '#9c27b0', '#00bcd4'];
+
+    // 3. Find the minimum and maximum boundaries to normalize user data to our 500px width
+    const minCoord = xCoordinates[0];
+    const maxCoord = xCoordinates[xCoordinates.length - 1];
+    const coordinateRange = maxCoord - minCoord;
+
+    let rectElements = '';
+    const totalSegments = xCoordinates.length - 1;
+
+    // 4. Loop through coordinates to compute widths
+    for (let i = 0; i < totalSegments; i++) {
+        const rawStartX = xCoordinates[i];
+        const rawEndX = xCoordinates[i + 1];
+
+        // Normalize data values relative to the total width profile (500px)
+        const currentX = ((rawStartX - minCoord) / coordinateRange) * totalBarWidth;
+        const nextX = ((rawEndX - minCoord) / coordinateRange) * totalBarWidth;
+        const segmentWidth = nextX - currentX;
+        console.log(i, rawStartX, rawEndX, currentX, nextX)
+
+        // Calculate absolute percentage of the whole
+        const percentageValue = ((rawEndX - rawStartX) / coordinateRange) * 100;
+        const percentageText = `${Math.round(percentageValue)}%`;
+
+        const color = colors[i % colors.length];
+
+        // Apply border-radius only to the far-left and far-right outer edges
+        let rxAttr = '';
+        if (i === 0) {
+            rxAttr = `rx="${borderRadius}"`; // Rounded left corners
+        }
+        else if (i === totalSegments - 1) {
+            rxAttr = `rx="${borderRadius}"`; // Rounded right corners
+        }
+
+        // Build the current segment rectangle
+        rectElements += `  <rect x="${currentX.toFixed(1)}" y="${startY}" width="${segmentWidth.toFixed(1)}" height="${barHeight}" fill="${color}" ${rxAttr} />\n`;
+
+        // Only draw percentage numbers inside the bar if the segment is wide enough to fit text
+        if (segmentWidth > 35) {
+            const textX = currentX + (segmentWidth / 2);
+            const textY = startY + (barHeight / 2) + 4; // Perfect alignment with baseline
+            rectElements += `  <text x="${textX.toFixed(1)}" y="${textY.toFixed(1)}" text-anchor="middle" fill="white" font-family="sans-serif" font-size="12" font-weight="bold" pointer-events="none">${percentageText}</text>\n`;
+        }
+    }
+
+    // 5. Assemble final SVG wrapper
+    const finalSVG = `
+<svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}" xmlns="http://w3.org">
+<g id="stacked-bar">
+${rectElements}  <rect x="0" y="${startY}" width="${totalBarWidth}" height="${barHeight}" rx="${borderRadius}" fill="none" stroke="#e0e0e0" stroke-width="1" />
+</g>
+</svg>`.trim();
+
+    return finalSVG;
+}
+// console.log(myData);
+
+const svgResult = generateStackedBarByCoords(myData);
+document.getElementById('chart-target').innerHTML = svgResult;
+</script>
