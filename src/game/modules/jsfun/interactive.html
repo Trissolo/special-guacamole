@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Simple Stupid Funnel Algorithm</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            user-select: none;
+        }
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin-top: 10px;
+            cursor: default;
+        }
+        .instructions {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div><strong>JavaScript Interactive Implementation of the Simple Stupid Funnel Algorithm</strong></div>
+<div class="instructions">Click and drag any blue (left) or black (right) point to modify the funnel path dynamically.</div>
+
+<canvas width="640" height="420"></canvas>
+
+<script type="text/javascript">
+// --- GEOMETRY UTILITIES ---
+const Point = (x, y) => ({ x, y });
+
+function triarea2(a, b, c) {
+    const ax = b.x - a.x;
+    const ay = b.y - a.y;
+    const bx = c.x - a.x;
+    const by = c.y - a.y;
+    return bx * ay - ax * by;
+}
+
+function vdistsqr(a, b) {
+    const x = b.x - a.x;
+    const y = b.y - a.y;
+    return Math.sqrt(x * x + y * y);
+}
+
+function vequal(a, b) {
+    return vdistsqr(a, b) < (0.001 * 0.001);
+}
+
+// --- CHANNEL ENGINE ---
+class Channel {
+    constructor() {
+        this.portals = [];
+        this.path = [];
+    }
+
+    push(p1, p2 = p1) {
+        this.portals.push({ left: p1, right: p2 });
+    }
+
+    stringPull() {
+        const portals = this.portals;
+        if (portals.length === 0) return [];
+        
+        const pts = [];
+        let portalApex = portals[0].left;
+        let portalLeft = portals[0].left;
+        let portalRight = portals[0].right;
+        
+        let apexIndex = 0;
+        let leftIndex = 0;
+        let rightIndex = 0;
+
+        pts.push(portalApex);
+        
+        for (let i = 1; i < portals.length; i++) {
+            const left = portals[i].left;
+            const right = portals[i].right;
+
+            // Update right vertex.
+            if (triarea2(portalApex, portalRight, right) <= 0.0) {
+                if (vequal(portalApex, portalRight) || triarea2(portalApex, portalLeft, right) > 0.0) {
+                    portalRight = right;
+                    rightIndex = i;
+                } else {
+                    pts.push(portalLeft);
+                    portalApex = portalLeft;
+                    apexIndex = leftIndex;
+                    portalLeft = portalApex;
+                    portalRight = portalApex;
+                    leftIndex = apexIndex;
+                    rightIndex = apexIndex;
+                    i = apexIndex;
+                    continue;
+                }
+            }
+
+            // Update left vertex.
+            if (triarea2(portalApex, portalLeft, left) >= 0.0) {
+                if (vequal(portalApex, portalLeft) || triarea2(portalApex, portalRight, left) < 0.0) {
+                    portalLeft = left;
+                    leftIndex = i;
+                } else {
+                    pts.push(portalRight);
+                    portalApex = portalRight;
+                    apexIndex = rightIndex;
+                    portalLeft = portalApex;
+                    portalRight = portalApex;
+                    leftIndex = apexIndex;
+                    rightIndex = apexIndex;
+                    i = apexIndex;
+                    continue;
+                }
+            }
+        }
+        
+        if ((pts.length === 0) || (!vequal(pts[pts.length - 1], portals[portals.length - 1].left))) {
+            pts.push(portals[portals.length - 1].left);
+        }
+        
+        this.path = pts;
+        return pts;
+    }
+
+    draw(ctx, pd, pm) {
+        ctx.save();
+        ctx.translate(pd.x, pd.y);
+        
+        const line = (p1, p2) => {
+            ctx.moveTo(p1.x * pm.x, p1.y * pm.y);
+            ctx.lineTo(p2.x * pm.x, p2.y * pm.y);
+        };
+        
+        const lines = (vv, z) => {
+            for (let n = 1; n < vv.length; n++) {
+                line(vv[n - 1][z], vv[n][z]);
+            }
+        };
+
+        // Draw Left (Blue) and Right (Black) channel boundaries
+        ctx.globalAlpha = 1.0;
+        const portals = this.portals;
+        
+        ['left', 'right'].forEach((v, k) => {
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = k ? 'black' : 'blue';
+            ctx.beginPath();
+            lines(portals, v);
+            ctx.stroke();
+
+            // Draw interactive handle circles
+            ctx.fillStyle = k ? 'black' : 'blue';
+            portals.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p[v].x * pm.x, p[v].y * pm.y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        });
+
+        // Draw Funnel Pulled Path (Red)
+        ctx.strokeStyle = 'red';
+        ctx.globalAlpha = 0.6;
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        for (let n = 1; n < this.path.length; n++) {
+            line(this.path[n - 1], this.path[n]);
+        }
+        ctx.stroke();
+        
+        ctx.restore();
+    }
+}
+
+// --- INTERACTION HANDLING SETUP ---
+const canvas = document.querySelector('canvas');
+const ctx = canvas.getContext('2d');
+
+// Origin Offset and Multiplier scaling configurations mapping algorithmic units to view space
+const viewOffset = Point(160, 250);
+const viewScale = Point(20, 20);
+
+// Initialize baseline static data
+const channel = new Channel();
+channel.push(Point(1, 0));
+channel.push(Point(0, 4), Point(4, 3));
+channel.push(Point(4, 7), Point(4, 3));
+channel.push(Point(16, 0), Point(10, 1));
+channel.push(Point(16, 0), Point(9, -5));
+channel.push(Point(12, -11));
+
+let selectedPoint = null; 
+const clickRadius = 8; // Selection hit-box radius in pixels
+
+// Convert raw screen screen coordinates to algorithm coordinate dimensions
+function getWorkspaceCoords(e) {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    return {
+        x: (mouseX - viewOffset.x) / viewScale.x,
+        y: (mouseY - viewOffset.y) / viewScale.y
+    };
+}
+
+// Render loop invocation
+function updateCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    channel.stringPull();
+    channel.draw(ctx, viewOffset, viewScale);
+}
+
+// --- INPUT REGISTER INTERFACES ---
+canvas.addEventListener('mousedown', (e) => {
+    const mouse = getWorkspaceCoords(e);
+    
+    // Scan all portals to determine if mouse is near a point handle
+    for (let i = 0; i < channel.portals.length; i++) {
+        const portal = channel.portals[i];
+        
+        // Convert distance checks to pixel distance approximations
+        const distLeft = vdistsqr(mouse, portal.left) * viewScale.x;
+        if (distLeft < clickRadius) {
+            selectedPoint = { portalIndex: i, side: 'left' };
+            canvas.style.cursor = 'grabbing';
+            return;
+        }
+        
+        const distRight = vdistsqr(mouse, portal.right) * viewScale.x;
+        if (distRight < clickRadius) {
+            selectedPoint = { portalIndex: i, side: 'right' };
+            canvas.style.cursor = 'grabbing';
+            return;
+        }
+    }
+});
+
+canvas.addEventListener('mousemove', (e) => {
+    const mouse = getWorkspaceCoords(e);
+    
+    if (selectedPoint) {
+        // Dragging state active: bound selected portal reference directly to current mouse projection
+        const p = channel.portals[selectedPoint.portalIndex];
+        p[selectedPoint.side] = Point(mouse.x, mouse.y);
+        
+        // Ensure index zero endpoints stay locked uniform together if needed by logic
+        if (selectedPoint.portalIndex === 0) {
+            p.right = p.left;
+        }
+        
+        updateCanvas();
+    } else {
+        // Hover state checking: Update pointer style when near handles
+        let overHandle = false;
+        for (let portal of channel.portals) {
+            if (vdistsqr(mouse, portal.left) * viewScale.x < clickRadius || 
+                vdistsqr(mouse, portal.right) * viewScale.x < clickRadius) {
+                overHandle = true;
+                break;
+            }
+        }
+        canvas.style.cursor = overHandle ? 'pointer' : 'default';
+    }
+});
+
+window.addEventListener('mouseup', () => {
+    if (selectedPoint) {
+        selectedPoint = null;
+        canvas.style.cursor = 'default';
+    }
+});
+
+// Run Initial Render Pass
+updateCanvas();
+</script>
+
+</body>
+</html>

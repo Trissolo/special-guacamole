@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Funnel Algorithm with Custom Click Controls</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            user-select: none;
+        }
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin-top: 10px;
+            cursor: default;
+            background-color: #fafafa;
+        }
+        .controls {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        button {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .instructions {
+            font-size: 14px;
+            color: #333;
+            background-color: #f1f5f9;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+            max-width: 610px;
+        }
+    </style>
+</head>
+<body>
+
+<div><strong>JavaScript Interactive Funnel Algorithm - Vertex Placement</strong></div>
+<div class="instructions">
+    • <strong>Left Drag:</strong> Adjust funnel profile handles.<br>
+    • <strong>Middle Click (Scroll Wheel):</strong> Snap the <strong>Starting Vertex</strong> to your mouse position.<br>
+    • <strong>Right Click:</strong> Snap the <strong>Ending Vertex</strong> to your mouse position.
+</div>
+
+<div class="controls" style="margin-top: 10px;">
+    <button id="regenBtn">Regenerate Obstacles</button>
+</div>
+
+<canvas width="640" height="420"></canvas>
+
+<script type="text/javascript">
+// --- GEOMETRY UTILITIES ---
+const Point = (x, y) => ({ x, y });
+
+function triarea2(a, b, c) {
+    const ax = b.x - a.x;
+    const ay = b.y - a.y;
+    const bx = c.x - a.x;
+    const by = c.y - a.y;
+    return bx * ay - ax * by;
+}
+
+function vdistsqr(a, b) {
+    const x = b.x - a.x;
+    const y = b.y - a.y;
+    return Math.sqrt(x * x + y * y);
+}
+
+function vequal(a, b) {
+    return vdistsqr(a, b) < (0.001 * 0.001);
+}
+
+// --- GLOBAL OBSTACLE STORAGE ---
+let obstacles = [];
+
+function generateRandomObstacles() {
+    obstacles = [];
+    const count = 3 + Math.floor(Math.random() * 3);
+    
+    for (let i = 0; i < count; i++) {
+        const cx = 2 + Math.random() * 12;
+        const cy = -8 + Math.random() * 12;
+        const rx = 1.0 + Math.random() * 1.8;
+        const ry = 1.0 + Math.random() * 1.8;
+        const sides = 3 + Math.floor(Math.random() * 3);
+        const poly = [];
+        
+        for (let j = 0; j < sides; j++) {
+            const angle = (j / sides) * Math.PI * 2 + (Math.random() * 0.2);
+            poly.push(Point(cx + Math.cos(angle) * rx, cy + Math.sin(angle) * ry));
+        }
+        obstacles.push(poly);
+    }
+}
+
+// --- CHANNEL ENGINE ---
+class Channel {
+    constructor() {
+        this.portals = [];
+        this.path = [];
+    }
+
+    push(p1, p2 = p1) {
+        this.portals.push({ left: p1, right: p2 });
+    }
+
+    stringPull() {
+        const portals = this.portals;
+        if (portals.length === 0) return [];
+        
+        const pts = [];
+        let portalApex = portals[0].left;
+        let portalLeft = portals[0].left;
+        let portalRight = portals[0].right;
+        
+        let apexIndex = 0;
+        let leftIndex = 0;
+        let rightIndex = 0;
+
+        pts.push(portalApex);
+        
+        for (let i = 1; i < portals.length; i++) {
+            const left = portals[i].left;
+            const right = portals[i].right;
+
+            if (triarea2(portalApex, portalRight, right) <= 0.0) {
+                if (vequal(portalApex, portalRight) || triarea2(portalApex, portalLeft, right) > 0.0) {
+                    portalRight = right;
+                    rightIndex = i;
+                } else {
+                    pts.push(portalLeft);
+                    portalApex = portalLeft;
+                    apexIndex = leftIndex;
+                    portalLeft = portalApex;
+                    portalRight = portalApex;
+                    leftIndex = apexIndex;
+                    rightIndex = apexIndex;
+                    i = apexIndex;
+                    continue;
+                }
+            }
+
+            if (triarea2(portalApex, portalLeft, left) >= 0.0) {
+                if (vequal(portalApex, portalLeft) || triarea2(portalApex, portalRight, left) < 0.0) {
+                    portalLeft = left;
+                    leftIndex = i;
+                } else {
+                    pts.push(portalRight);
+                    portalApex = portalRight;
+                    apexIndex = rightIndex;
+                    portalLeft = portalApex;
+                    portalRight = portalApex;
+                    leftIndex = apexIndex;
+                    rightIndex = apexIndex;
+                    i = apexIndex;
+                    continue;
+                }
+            }
+        }
+        
+        if ((pts.length === 0) || (!vequal(pts[pts.length - 1], portals[portals.length - 1].left))) {
+            pts.push(portals[portals.length - 1].left);
+        }
+        
+        this.path = pts;
+        return pts;
+    }
+
+    draw(ctx, pd, pm) {
+        ctx.save();
+        ctx.translate(pd.x, pd.y);
+        
+        const line = (p1, p2) => {
+            ctx.moveTo(p1.x * pm.x, p1.y * pm.y);
+            ctx.lineTo(p2.x * pm.x, p2.y * pm.y);
+        };
+        
+        const lines = (vv, z) => {
+            for (let n = 1; n < vv.length; n++) {
+                line(vv[n - 1][z], vv[n][z]);
+            }
+        };
+
+        // 1. Obstacles
+        ctx.fillStyle = '#e2e8f0';
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 1.5;
+        obstacles.forEach(poly => {
+            ctx.beginPath();
+            ctx.moveTo(poly[0].x * pm.x, poly[0].y * pm.y);
+            for (let i = 1; i < poly.length; i++) {
+                ctx.lineTo(poly[i].x * pm.x, poly[i].y * pm.y);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        });
+
+        // 2. Channel Gates
+        ctx.globalAlpha = 1.0;
+        const portals = this.portals;
+        
+        ['left', 'right'].forEach((v, k) => {
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = k ? '#1e293b' : '#2563eb';
+            ctx.beginPath();
+            lines(portals, v);
+            ctx.stroke();
+
+            portals.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p[v].x * pm.x, p[v].y * pm.y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        });
+
+        // 3. Funnel Path (Red Line)
+        ctx.strokeStyle = '#ef4444';
+        ctx.globalAlpha = 0.9;
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        for (let n = 1; n < this.path.length; n++) {
+            line(this.path[n - 1], this.path[n]);
+        }
+        ctx.stroke();
+        
+        ctx.restore();
+    }
+}
+
+// --- INTERACTION INITIALIZATION ---
+const canvas = document.querySelector('canvas');
+const ctx = canvas.getContext('2d');
+
+const viewOffset = Point(140, 230);
+const viewScale = Point(9, 9);
+
+const channel = new Channel();
+channel.push(Point(0, 0));
+channel.push(Point(0.5, 4),   Point(4, 3.5));
+channel.push(Point(4, 7),     Point(4.5, 2.5));
+channel.push(Point(16, 0.5),  Point(10.5, 1));
+channel.push(Point(16, 0),    Point(9, -5.5));
+channel.push(Point(12, -11));
+
+let selectedPoint = null; 
+const clickRadius = 10; 
+
+function getWorkspaceCoords(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+        x: (e.clientX - rect.left - viewOffset.x) / viewScale.x,
+        y: (e.clientY - rect.top - viewOffset.y) / viewScale.y
+    };
+}
+
+function updateCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    channel.stringPull();
+    channel.draw(ctx, viewOffset, viewScale);
+}
+
+// Prevent browser context menu popups from conflicting with right-clicks
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+canvas.addEventListener('mousedown', (e) => {
+    const mouse = getWorkspaceCoords(e);
+    
+    // --- MIDDLE CLICK: Set Start Node Vertex ---
+    if (e.button === 1) {
+        e.preventDefault();
+        const startPortal = channel.portals[0];
+        startPortal.left = Point(mouse.x, mouse.y);
+        startPortal.right = Point(mouse.x, mouse.y); // Lock uniform point
+        updateCanvas();
+        return;
+    }
+    
+    // --- RIGHT CLICK: Set End Node Vertex ---
+    if (e.button === 2) {
+        const endPortal = channel.portals[channel.portals.length - 1];
+        endPortal.left = Point(mouse.x, mouse.y);
+        endPortal.right = Point(mouse.x, mouse.y); // Lock uniform point
+        updateCanvas();
+        return;
+    }
+
+    // --- LEFT CLICK: Standard Dragging Engine ---
+    if (e.button === 0) {
+        for (let i = 0; i < channel.portals.length; i++) {
+            const portal = channel.portals[i];
+            if (vdistsqr(mouse, portal.left) * viewScale.x < clickRadius) {
+                selectedPoint = { portalIndex: i, side: 'left' };
+                canvas.style.cursor = 'grabbing';
+                return;
+            }
+            if (vdistsqr(mouse, portal.right) * viewScale.x < clickRadius) {
+                selectedPoint = { portalIndex: i, side: 'right' };
+                canvas.style.cursor = 'grabbing';
+                return;
+            }
+        }
+    }
+});
+
+canvas.addEventListener('mousemove', (e) => {
+    const mouse = getWorkspaceCoords(e);
+    
+    if (selectedPoint) {
+        const p = channel.portals[selectedPoint.portalIndex];
+        p[selectedPoint.side] = Point(mouse.x, mouse.y);
+        
+        if (selectedPoint.portalIndex === 0) {
+            p.right = p.left;
+        }
+if (selectedPoint.portalIndex === channel.portals.length - 1) {
+p.left = p.right;
+}
+updateCanvas();
+} else {
+let overHandle = false;
+for (let portal of channel.portals) {
+if (vdistsqr(mouse, portal.left) * viewScale.x < clickRadius ||
+vdistsqr(mouse, portal.right) * viewScale.x < clickRadius) {
+overHandle = true;
+break;
+}
+}
+canvas.style.cursor = overHandle ? 'pointer' : 'default';
+}
+});
+window.addEventListener('mouseup', () => {
+if (selectedPoint) {
+selectedPoint = null;
+canvas.style.cursor = 'default';
+}
+});
+document.getElementById('regenBtn').addEventListener('click', () => {
+generateRandomObstacles();
+updateCanvas();
+});
+generateRandomObstacles();
+updateCanvas();
+
+</script>
+</body>
+</html>
